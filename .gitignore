@@ -1,0 +1,51 @@
+# Compiled class files
+target/
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machines / temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+.loadpath
+
+# Environment variables
+.env
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE - Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# IDE - Visual Studio Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bank.controller.AccountController"
+            stylesheets="@styles.css"
+            prefWidth="1150.0" prefHeight="760.0">
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar-brand-box" spacing="4.0">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="🏦" style="-fx-font-size: 24px;"/>
+                    <VBox>
+                        <Text text="Apex Trust Bank" styleClass="brand-title"/>
+                        <Text text="Management System" styleClass="brand-subtitle"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox styleClass="sidebar-nav-container" VBox.vgrow="ALWAYS" spacing="10.0">
+                <Button text="📊  Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+                <Button text="💳  Process Transactions" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <VBox styleClass="user-profile-card" spacing="4.0">
+                    <Text text="OPERATOR SESSION" style="-fx-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+                    <Label fx:id="operatorNameLabel" text="Logged in as: Staff" style="-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label text="Module: Account Admin" style="-fx-text-fill: #93c5fd; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN BODY -->
+    <center>
+        <VBox>
+            <!-- Top Header -->
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="2.0">
+                    <Text text="Account Administration &amp; Onboarding" styleClass="heading-lg"/>
+                    <Label text="Create new customer bank accounts, query client details, and monitor ledger statuses." styleClass="text-secondary"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox alignment="CENTER" styleClass="demo-banner">
+                    <Label fx:id="demoBadgeLabel" text="⚡ DEMO / PRANITA MODULE READY" styleClass="demo-badge-text"/>
+                </HBox>
+            </HBox>
+
+            <!-- Scrollable Content -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="20.0">
+
+                    <!-- Global Alert / Status Box -->
+                    <Label fx:id="statusMessageLabel" text="" wrapText="true" visible="false" managed="false"/>
+
+                    <!-- Upper Grid: Create Account (Left) + Search Account (Right) -->
+                    <GridPane hgap="20.0" vgap="20.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="56.0"/>
+                            <ColumnConstraints percentWidth="44.0"/>
+                        </columnConstraints>
+
+                        <!-- Card 1: Create Account Form -->
+                        <VBox GridPane.columnIndex="0" styleClass="card" spacing="14.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="➕" style="-fx-font-size: 18px;"/>
+                                <VBox>
+                                    <Text text="Open New Customer Account" styleClass="heading-md"/>
+                                    <Label text="Pranita's AccountService contract integration" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+
+                            <!-- Input Grid -->
+                            <GridPane hgap="14.0" vgap="12.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50.0"/>
+                                    <ColumnConstraints percentWidth="50.0"/>
+                                </columnConstraints>
+
+                                <!-- Full Name -->
+                                <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="4.0">
+                                    <Label text="Customer Full Name *" styleClass="form-label"/>
+                                    <TextField fx:id="customerNameField" promptText="e.g. Eleanor Vance"/>
+                                </VBox>
+
+                                <!-- Email -->
+                                <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="4.0">
+                                    <Label text="Email Address *" styleClass="form-label"/>
+                                    <TextField fx:id="emailField" promptText="e.g. eleanor@example.com"/>
+                                </VBox>
+
+                                <!-- Phone -->
+                                <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="4.0">
+                                    <Label text="Phone Number *" styleClass="form-label"/>
+                                    <TextField fx:id="phoneField" promptText="e.g. 9876543210"/>
+                                </VBox>
+
+                                <!-- Account Type -->
+                                <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="4.0">
+                                    <Label text="Account Type *" styleClass="form-label"/>
+                                    <ComboBox fx:id="accountTypeCombo" maxWidth="Infinity" promptText="Select type"/>
+                                </VBox>
+
+                                <!-- Initial Deposit -->
+                                <VBox GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2" spacing="4.0">
+                                    <Label text="Initial Deposit Amount ($) *" styleClass="form-label"/>
+                                    <TextField fx:id="initialDepositField" promptText="e.g. 500.00 (Minimum $0.00)"/>
+                                </VBox>
+                            </GridPane>
+
+                            <!-- Form Action Buttons -->
+                            <HBox spacing="12.0" alignment="CENTER_LEFT">
+                                <Button fx:id="createAccountBtn" text="✓ Create Account" onAction="#handleCreateAccount" styleClass="btn-primary"/>
+                                <Button text="Clear Form" onAction="#handleResetForm" styleClass="btn-secondary"/>
+                            </HBox>
+
+                            <!-- New Account Result Preview Banner -->
+                            <VBox fx:id="newAccountSuccessBox" styleClass="alert-box, alert-success" spacing="4.0" visible="false" managed="false">
+                                <Label text="🎉 Account Successfully Created!" style="-fx-font-weight: bold; -fx-text-fill: #065f46;"/>
+                                <HBox spacing="14.0">
+                                    <Label fx:id="createdAccNumLabel" text="Account: ACC-XXXX" style="-fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                                    <Label fx:id="createdHolderLabel" text="Holder: Name" style="-fx-text-fill: #065f46;"/>
+                                    <Label fx:id="createdBalLabel" text="Balance: $0.00" style="-fx-font-weight: bold; -fx-text-fill: #065f46;"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Card 2: Search & Account Details -->
+                        <VBox GridPane.columnIndex="1" styleClass="card" spacing="14.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="🔍" style="-fx-font-size: 18px;"/>
+                                <VBox>
+                                    <Text text="Account Lookup &amp; Inspector" styleClass="heading-md"/>
+                                    <Label text="Query any account by account number" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+
+                            <!-- Search Input -->
+                            <HBox spacing="8.0">
+                                <TextField fx:id="searchAccountField" promptText="Enter Account # (e.g. ACC-1001)" HBox.hgrow="ALWAYS"
+                                           onAction="#handleSearchAccount"/>
+                                <Button text="Search" onAction="#handleSearchAccount" styleClass="btn-primary"/>
+                            </HBox>
+
+                            <!-- Account Details Card View -->
+                            <VBox fx:id="accountDetailsCard" style="-fx-background-color: #f8fafc; -fx-padding: 16px; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;" spacing="10.0">
+                                <HBox alignment="CENTER_LEFT">
+                                    <VBox>
+                                        <Label fx:id="detailAccNumberLabel" text="ACC-1001" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f2942;"/>
+                                        <Label fx:id="detailCustomerNameLabel" text="Keerthana Rao" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="detailStatusBadge" text="ACTIVE" style="-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-font-weight: bold; -fx-padding: 4px 10px; -fx-background-radius: 20px; -fx-font-size: 11px;"/>
+                                </HBox>
+
+                                <Separator/>
+
+                                <GridPane vgap="8.0" hgap="10.0">
+                                    <Label text="Current Balance:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="detailBalanceLabel" text="12,500.00" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #059669; -fx-font-size: 14px;"/>
+
+                                    <Label text="Account Type:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="detailTypeLabel" text="SAVINGS" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+
+                                    <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="detailEmailLabel" text="keerthana@bank.com" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #334155;"/>
+
+                                    <Label text="Phone:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="detailPhoneLabel" text="9876543210" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #334155;"/>
+
+                                    <Label text="Created On:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="detailCreatedLabel" text="2026-09-01 10:00" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                </GridPane>
+                            </VBox>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- Card 3: All Accounts TableView -->
+                    <VBox styleClass="card" spacing="14.0">
+                        <HBox alignment="CENTER_LEFT" spacing="14.0">
+                            <VBox spacing="2.0">
+                                <Text text="Registered Bank Accounts Directory" styleClass="heading-md"/>
+                                <Label text="Master ledger of all consumer and commercial accounts" styleClass="text-secondary" style="-fx-font-size: 12px;"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <HBox spacing="8.0" alignment="CENTER_RIGHT">
+                                <TextField fx:id="tableFilterField" promptText="Filter by name / number..." prefWidth="220.0"/>
+                                <Button text="🔄 Refresh Directory" onAction="#handleRefreshTable" styleClass="btn-secondary"/>
+                            </HBox>
+                        </HBox>
+
+                        <TableView fx:id="accountsTable" prefHeight="260.0">
+                            <columns>
+                                <TableColumn fx:id="colAccNumber" text="Account #" prefWidth="120.0"/>
+                                <TableColumn fx:id="colHolderName" text="Customer Name" prefWidth="160.0"/>
+                                <TableColumn fx:id="colAccType" text="Type" prefWidth="110.0"/>
+                                <TableColumn fx:id="colBalance" text="Current Balance" prefWidth="140.0"/>
+                                <TableColumn fx:id="colStatus" text="Status" prefWidth="100.0"/>
+                                <TableColumn fx:id="colEmail" text="Email" prefWidth="180.0"/>
+                                <TableColumn fx:id="colPhone" text="Phone" prefWidth="130.0"/>
+                                <TableColumn fx:id="colCreated" text="Created Date" prefWidth="140.0"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="No accounts found in directory."/>
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

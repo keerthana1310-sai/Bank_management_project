@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bank.controller.TransactionController"
+            stylesheets="@styles.css"
+            prefWidth="1150.0" prefHeight="760.0">
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar-brand-box" spacing="4.0">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="🏦" style="-fx-font-size: 24px;"/>
+                    <VBox>
+                        <Text text="Apex Trust Bank" styleClass="brand-title"/>
+                        <Text text="Management System" styleClass="brand-subtitle"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox styleClass="sidebar-nav-container" VBox.vgrow="ALWAYS" spacing="10.0">
+                <Button text="📊  Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="💳  Process Transactions" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+                <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <VBox styleClass="user-profile-card" spacing="4.0">
+                    <Text text="OPERATOR SESSION" style="-fx-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+                    <Label fx:id="operatorNameLabel" text="Logged in as: Staff" style="-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label text="Module: Teller Services" style="-fx-text-fill: #93c5fd; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN BODY -->
+    <center>
+        <VBox>
+            <!-- Top Header -->
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="2.0">
+                    <Text text="Transaction Processing Center" styleClass="heading-lg"/>
+                    <Label text="Process deposits, cash withdrawals, and atomic funds transfers." styleClass="text-secondary"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox alignment="CENTER" styleClass="demo-banner">
+                    <Label fx:id="demoBadgeLabel" text="⚡ JAYASREE MODULE READY" styleClass="demo-badge-text"/>
+                </HBox>
+            </HBox>
+
+            <!-- Scrollable Content Area -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="20.0">
+
+                    <!-- Global Alert Notification -->
+                    <Label fx:id="statusAlertLabel" text="" wrapText="true" visible="false" managed="false"/>
+
+                    <GridPane hgap="22.0" vgap="20.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="55.0"/>
+                            <ColumnConstraints percentWidth="45.0"/>
+                        </columnConstraints>
+
+                        <!-- Card 1: Transaction Form -->
+                        <VBox GridPane.columnIndex="0" styleClass="card" spacing="16.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="💳" style="-fx-font-size: 20px;"/>
+                                <VBox>
+                                    <Text text="Transaction Terminal" styleClass="heading-md"/>
+                                    <Label text="Backend updates delegated to Jayasree's TransactionService" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+
+                            <!-- Transaction Type Selector -->
+                            <VBox spacing="6.0">
+                                <Label text="Select Transaction Type *" styleClass="form-label"/>
+                                <ComboBox fx:id="transactionTypeCombo" maxWidth="Infinity" onAction="#handleTypeChanged"/>
+                            </VBox>
+
+                            <!-- Source Account Number -->
+                            <VBox spacing="6.0">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Source Account Number *" styleClass="form-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Hyperlink text="Check Balance Preview" onAction="#handleCheckSourceAccount" style="-fx-font-size: 11px; -fx-text-fill: #2563eb;"/>
+                                </HBox>
+                                <TextField fx:id="sourceAccountField" promptText="e.g. ACC-1001"
+                                           onAction="#handleCheckSourceAccount"/>
+                            </VBox>
+
+                            <!-- Destination Account (For Transfers only) -->
+                            <VBox fx:id="destAccountBox" spacing="6.0">
+                                <Label text="Destination Account Number (For Transfers) *" styleClass="form-label"/>
+                                <TextField fx:id="destAccountField" promptText="e.g. ACC-1002"/>
+                                <Label text="Required for Wire Transfers only." styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                            </VBox>
+
+                            <!-- Monetary Amount -->
+                            <VBox spacing="6.0">
+                                <Label text="Transaction Amount ($) *" styleClass="form-label"/>
+                                <TextField fx:id="amountField" promptText="0.00 (Must be strictly positive)"/>
+                            </VBox>
+
+                            <!-- Description / Memo -->
+                            <VBox spacing="6.0">
+                                <Label text="Transaction Memo / Remarks (Optional)" styleClass="form-label"/>
+                                <TextField fx:id="descriptionField" promptText="e.g. Counter deposit, tuition payment"/>
+                            </VBox>
+
+                            <!-- Action Buttons -->
+                            <HBox spacing="14.0" alignment="CENTER_LEFT">
+                                <Button fx:id="submitButton" text="⚡ Execute Transaction" onAction="#handleSubmitTransaction" styleClass="btn-primary" style="-fx-font-size: 14px; -fx-padding: 12px 24px;"/>
+                                <Button text="Reset Form" onAction="#handleClearForm" styleClass="btn-secondary"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Card 2: Live Account Preview & Digital Receipt -->
+                        <VBox GridPane.columnIndex="1" spacing="20.0">
+
+                            <!-- Account Balance Preview Card -->
+                            <VBox styleClass="card" spacing="12.0">
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <Label text="🔍" style="-fx-font-size: 16px;"/>
+                                    <Text text="Source Account Telemetry" styleClass="heading-md"/>
+                                </HBox>
+                                <Separator/>
+                                <VBox spacing="8.0">
+                                    <HBox>
+                                        <Label text="Account Status:" style="-fx-text-fill: #64748b;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="previewStatusLabel" text="Pending verification" style="-fx-text-fill: #94a3b8; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                    <HBox>
+                                        <Label text="Account Holder:" style="-fx-text-fill: #64748b;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="previewHolderLabel" text="--" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                                    </HBox>
+                                    <HBox>
+                                        <Label text="Current Ledger Balance:" style="-fx-text-fill: #64748b;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="previewBalanceLabel" text="0.00" style="-fx-font-weight: bold; -fx-text-fill: #059669; -fx-font-size: 16px;"/>
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+
+                            <!-- Digital Receipt Card (Displayed on success) -->
+                            <VBox fx:id="receiptBox" styleClass="card" spacing="14.0" style="-fx-border-color: #10b981; -fx-border-width: 1.5;" visible="false" managed="false">
+                                <HBox alignment="CENTER_LEFT">
+                                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                        <Label text="✅" style="-fx-font-size: 18px;"/>
+                                        <Text text="Transaction Receipt" styleClass="heading-md" style="-fx-fill: #065f46;"/>
+                                    </HBox>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="receiptTypeBadge" text="DEPOSIT" style="-fx-background-color: #d1fae5; -fx-text-fill: #065f46; -fx-padding: 3px 8px; -fx-background-radius: 4px; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                </HBox>
+
+                                <Separator/>
+
+                                <GridPane vgap="8.0" hgap="10.0">
+                                    <Label text="Receipt / TX ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="receiptTxIdLabel" text="#5005" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+
+                                    <Label text="Source Account:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="receiptSourceLabel" text="ACC-1001" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+
+                                    <Label text="Destination Account:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="receiptDestLabel" text="--" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                    <Label text="Processed Amount:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="receiptAmountLabel" text="500.00" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #2563eb;"/>
+
+                                    <Label text="Updated Balance:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="receiptNewBalanceLabel" text="13,000.00" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #059669;"/>
+
+                                    <Label text="Timestamp:" GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <Label fx:id="receiptTimestampLabel" text="2026-10-30 14:00" GridPane.rowIndex="5" GridPane.columnIndex="1" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                </GridPane>
+                            </VBox>
+
+                        </VBox>
+                    </GridPane>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

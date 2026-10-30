@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bank.controller.HistoryController"
+            stylesheets="@styles.css"
+            prefWidth="1150.0" prefHeight="760.0">
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar-brand-box" spacing="4.0">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="🏦" style="-fx-font-size: 24px;"/>
+                    <VBox>
+                        <Text text="Apex Trust Bank" styleClass="brand-title"/>
+                        <Text text="Management System" styleClass="brand-subtitle"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox styleClass="sidebar-nav-container" VBox.vgrow="ALWAYS" spacing="10.0">
+                <Button text="📊  Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="💳  Process Transactions" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <VBox styleClass="user-profile-card" spacing="4.0">
+                    <Text text="OPERATOR SESSION" style="-fx-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+                    <Label fx:id="operatorNameLabel" text="Logged in as: Staff" style="-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label text="Module: Audit &amp; Compliance" style="-fx-text-fill: #93c5fd; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN BODY -->
+    <center>
+        <VBox>
+            <!-- Top Header -->
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="2.0">
+                    <Text text="Transaction Audit &amp; History Ledger" styleClass="heading-lg"/>
+                    <Label text="Immutable audit trail of all customer credits, debits, and transfers." styleClass="text-secondary"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox alignment="CENTER" styleClass="demo-banner">
+                    <Label fx:id="demoBadgeLabel" text="⚡ DEMO AUDIT ACTIVE" styleClass="demo-badge-text"/>
+                </HBox>
+            </HBox>
+
+            <!-- Scrollable Content Area -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="20.0">
+
+                    <!-- Filter Control Card -->
+                    <VBox styleClass="card" spacing="14.0">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Text text="🔍 Filter &amp; Search Ledger" styleClass="heading-md"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="summaryCountLabel" text="Showing: 0 transactions" styleClass="text-secondary" style="-fx-font-weight: bold;"/>
+                        </HBox>
+
+                        <HBox spacing="14.0" alignment="CENTER_LEFT">
+                            <!-- Account Search -->
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Search by Account #" styleClass="form-label"/>
+                                <TextField fx:id="accountFilterField" promptText="e.g. ACC-1001" onAction="#handleApplyFilter"/>
+                            </VBox>
+
+                            <!-- Type Filter -->
+                            <VBox spacing="4.0" prefWidth="200.0">
+                                <Label text="Transaction Type" styleClass="form-label"/>
+                                <ComboBox fx:id="typeFilterCombo" maxWidth="Infinity" onAction="#handleApplyFilter"/>
+                            </VBox>
+
+                            <!-- Filter Buttons -->
+                            <VBox spacing="4.0" alignment="BOTTOM_LEFT">
+                                <Label text="" styleClass="form-label"/>
+                                <HBox spacing="8.0">
+                                    <Button text="Apply Filter" onAction="#handleApplyFilter" styleClass="btn-primary"/>
+                                    <Button text="Clear" onAction="#handleClearFilter" styleClass="btn-secondary"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- TableView Card -->
+                    <VBox styleClass="card" spacing="14.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <Text text="Ledger Records" styleClass="heading-md"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="🔄 Refresh Ledger" onAction="#handleRefresh" styleClass="btn-secondary"/>
+                        </HBox>
+
+                        <TableView fx:id="historyTable" prefHeight="400.0">
+                            <columns>
+                                <TableColumn fx:id="colTxId" text="Tx ID" prefWidth="90.0"/>
+                                <TableColumn fx:id="colTimestamp" text="Date &amp; Time" prefWidth="160.0"/>
+                                <TableColumn fx:id="colType" text="Type" prefWidth="120.0"/>
+                                <TableColumn fx:id="colSource" text="Source Account" prefWidth="140.0"/>
+                                <TableColumn fx:id="colDest" text="Destination Account" prefWidth="160.0"/>
+                                <TableColumn fx:id="colAmount" text="Amount" prefWidth="130.0"/>
+                                <TableColumn fx:id="colBalanceAfter" text="Balance After" prefWidth="140.0"/>
+                                <TableColumn fx:id="colDescription" text="Memo / Description" prefWidth="200.0"/>
+                            </columns>
+                            <placeholder>
+                                <VBox alignment="CENTER" spacing="8.0">
+                                    <Label text="📭" style="-fx-font-size: 28px;"/>
+                                    <Label text="No transaction records match the specified search criteria." style="-fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                                    <Label text="Try adjusting or clearing your filters." styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                                </VBox>
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

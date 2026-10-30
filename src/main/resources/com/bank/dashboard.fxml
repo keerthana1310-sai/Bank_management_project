@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bank.controller.DashboardController"
+            stylesheets="@styles.css"
+            prefWidth="1150.0" prefHeight="760.0">
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar">
+            <!-- Brand Section -->
+            <VBox styleClass="sidebar-brand-box" spacing="4.0">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="🏦" style="-fx-font-size: 24px;"/>
+                    <VBox>
+                        <Text text="Apex Trust Bank" styleClass="brand-title"/>
+                        <Text text="Management System" styleClass="brand-subtitle"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Navigation Links -->
+            <VBox styleClass="sidebar-nav-container" VBox.vgrow="ALWAYS" spacing="10.0">
+                <Button text="📊  Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+                <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="💳  Process Transactions" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <!-- User Profile Summary in Sidebar -->
+                <VBox styleClass="user-profile-card" spacing="4.0">
+                    <Text text="OPERATOR SESSION" style="-fx-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+                    <Label fx:id="operatorNameLabel" text="Logged in as: Staff" style="-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label text="Role: Branch Officer" style="-fx-text-fill: #93c5fd; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <!-- Logout Button -->
+                <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN BODY CONTENT -->
+    <center>
+        <VBox>
+            <!-- Top Header Bar -->
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="2.0">
+                    <Text text="Operational Overview" styleClass="heading-lg"/>
+                    <Label fx:id="welcomeLabel" text="Welcome to the core banking terminal" styleClass="text-secondary"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox alignment="CENTER" spacing="12.0">
+                    <VBox alignment="CENTER_RIGHT">
+                        <Label fx:id="currentDateLabel" text="2026-10-30" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                        <Label text="System Status: Operational" style="-fx-font-size: 11px; -fx-text-fill: #10b981;"/>
+                    </VBox>
+                    <HBox alignment="CENTER" styleClass="demo-banner">
+                        <Label fx:id="demoBadgeLabel" text="⚡ DEMO DATA" styleClass="demo-badge-text"/>
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <!-- Scrollable Dashboard Content -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="24.0">
+
+                    <!-- KPI Statistics Summary Grid -->
+                    <GridPane hgap="18.0" vgap="18.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="25.0"/>
+                            <ColumnConstraints percentWidth="25.0"/>
+                            <ColumnConstraints percentWidth="25.0"/>
+                            <ColumnConstraints percentWidth="25.0"/>
+                        </columnConstraints>
+
+                        <!-- KPI 1: Total Accounts -->
+                        <VBox GridPane.columnIndex="0" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label text="👥" styleClass="kpi-icon-badge-blue" style="-fx-font-size: 16px;"/>
+                                <Label text="TOTAL ACCOUNTS" styleClass="kpi-title"/>
+                            </HBox>
+                            <Label fx:id="kpiAccountsLabel" text="--" styleClass="kpi-value"/>
+                            <Label text="Active bank accounts registered" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- KPI 2: Total Balance / Vault -->
+                        <VBox GridPane.columnIndex="1" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label text="💰" styleClass="kpi-icon-badge-green" style="-fx-font-size: 16px;"/>
+                                <Label text="TOTAL DEPOSITS" styleClass="kpi-title"/>
+                            </HBox>
+                            <Label fx:id="kpiDepositsLabel" text="0.00" styleClass="kpi-value" style="-fx-text-fill: #059669;"/>
+                            <Label text="Aggregated client liquidity" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- KPI 3: Total Transactions -->
+                        <VBox GridPane.columnIndex="2" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label text="📈" styleClass="kpi-icon-badge-purple" style="-fx-font-size: 16px;"/>
+                                <Label text="TOTAL TRANSACTIONS" styleClass="kpi-title"/>
+                            </HBox>
+                            <Label fx:id="kpiTransactionsLabel" text="--" styleClass="kpi-value"/>
+                            <Label text="Logged deposits, withdrawals &amp; transfers" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- KPI 4: Active Mode -->
+                        <VBox GridPane.columnIndex="3" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label text="🛡️" styleClass="kpi-icon-badge-amber" style="-fx-font-size: 16px;"/>
+                                <Label text="DATA REPOSITORY" styleClass="kpi-title"/>
+                            </HBox>
+                            <Label fx:id="kpiRepoModeLabel" text="In-Memory" styleClass="kpi-value" style="-fx-font-size: 20px;"/>
+                            <Label text="Ready for MySQL JDBC hookup" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- Quick Actions Row -->
+                    <VBox styleClass="card" spacing="14.0">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Text text="⚡ Quick Operations" styleClass="heading-md"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="Frequently used branch workflows" styleClass="text-muted" style="-fx-font-size: 12px;"/>
+                        </HBox>
+                        <HBox spacing="14.0">
+                            <Button text="➕ Open New Account" onAction="#navToAccounts" styleClass="btn-primary"/>
+                            <Button text="📥 Make a Deposit" onAction="#navToTransactions" styleClass="btn-secondary"/>
+                            <Button text="📤 Process Withdrawal" onAction="#navToTransactions" styleClass="btn-secondary"/>
+                            <Button text="🔁 Wire Transfer" onAction="#navToTransactions" styleClass="btn-secondary"/>
+                            <Button text="📑 Audit History" onAction="#navToHistory" styleClass="btn-secondary"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Recent Transactions Table Preview -->
+                    <VBox styleClass="card" spacing="14.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <VBox spacing="2.0">
+                                <Text text="Recent Ledger Activity" styleClass="heading-md"/>
+                                <Label text="Real-time audit log of the most recent transactions" styleClass="text-secondary" style="-fx-font-size: 12px;"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="View All History →" onAction="#navToHistory" styleClass="btn-secondary" style="-fx-font-size: 12px; -fx-padding: 6px 12px;"/>
+                        </HBox>
+
+                        <TableView fx:id="recentTransactionsTable" prefHeight="220.0">
+                            <columns>
+                                <TableColumn fx:id="colId" text="TX ID" prefWidth="90.0"/>
+                                <TableColumn fx:id="colType" text="Type" prefWidth="120.0"/>
+                                <TableColumn fx:id="colSource" text="Source Account" prefWidth="140.0"/>
+                                <TableColumn fx:id="colDest" text="Destination Account" prefWidth="160.0"/>
+                                <TableColumn fx:id="colAmount" text="Amount" prefWidth="130.0"/>
+                                <TableColumn fx:id="colDescription" text="Description / Remark" prefWidth="200.0"/>
+                                <TableColumn fx:id="colDate" text="Date &amp; Time" prefWidth="170.0"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="No transaction records currently registered."/>
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
