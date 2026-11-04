@@ -17,8 +17,27 @@ public class JdbcAccountService implements AccountService {
     private final AccountDAO accountDAO;
     private final CustomerDAO customerDAO;
 
-    public JdbcAccountService() {
+        public JdbcAccountService() {
         this.accountDAO = new AccountDAO();
         this.customerDAO = new CustomerDAO();
+    }
+
+    @Override
+    public Optional<Account> findAccount(String accountNumber)
+            throws BankingException {
+        try {
+            return accountDAO.findByAccountNumber(accountNumber);
+        } catch (SQLException e) {
+            throw new BankingException("Failed to find account", e);
+        }
+    }
+
+    @Override
+    public List<Account> getAllAccounts() throws BankingException {
+        try {
+            return accountDAO.findAll();
+        } catch (SQLException e) {
+            throw new BankingException("Failed to retrieve accounts", e);
+        }
     }
 }
