@@ -40,7 +40,7 @@ public class JdbcAccountService implements AccountService {
             throw new BankingException("Failed to retrieve accounts", e);
         }
     }
-}
+
     @Override
     public Account updateAccount(Account account) throws BankingException {
         if (account == null || account.getAccountNumber() == null) {
@@ -92,3 +92,4 @@ public class JdbcAccountService implements AccountService {
             throw new BankingException("Database error while updating account", e);
         }
     }
+}
