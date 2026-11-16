@@ -1,12 +1,17 @@
 package com.bank.dao;
 
-import com.bank.model.Account;
-
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.bank.model.Account;
 
 /**
  * Data Access Object for Accounts table.
@@ -56,24 +61,77 @@ public class AccountDAO {
     /**
      * Looks up an account by its unique account number.
      */
-    public Optional<Account> findByAccountNumber(String accountNumber) throws SQLException {
-        String sql = "SELECT account_number, customer_id, customer_name, email, phone, " +
-                     "account_type, balance, status, created_at FROM accounts WHERE account_number = ?";
+   public Optional<Account> findByAccountNumber(String accountNumber) throws SQLException {
+    String sql = "SELECT account_number, customer_id, customer_name, email, phone, " +
+                 "account_type, balance, status, created_at FROM accounts WHERE account_number = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, accountNumber);
+        stmt.setString(1, accountNumber);
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Account account = mapResultSetToAccount(rs);
-                    return Optional.of(account);
-                }
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                Account account = mapResultSetToAccount(rs);
+                return Optional.of(account);
             }
         }
-        return Optional.empty();
     }
+    return Optional.empty();
+}
+/**
+ * Finds an account using an existing database connection.
+ * The connection is managed by the calling transaction.
+ */
+public Optional<Account> findByAccountNumber(
+        String accountNumber, Connection conn) throws SQLException {
+
+    String sql = "SELECT account_number, customer_id, customer_name, email, phone, " +
+            "account_type, balance, status, created_at " +
+            "FROM accounts WHERE account_number = ?";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setString(1, accountNumber);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return Optional.of(mapResultSetToAccount(rs));
+            }
+        }
+    }
+
+    return Optional.empty();
+}
+public Optional<Account> findByAccountNumberForUpdate(
+        String accountNumber, Connection conn) throws SQLException {
+
+    String sql = "SELECT account_number, customer_id, customer_name, email, phone, " +
+                 "account_type, balance, status, created_at " +
+                 "FROM accounts WHERE account_number = ? FOR UPDATE";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setString(1, accountNumber);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                Account account = mapResultSetToAccount(rs);
+                return Optional.of(account);
+            }
+        }
+    }
+
+    return Optional.empty();
+}
+
+// NEW METHOD ENDS HERE
+
+
+// Your next existing method continues below.
+
+
 
     /**
      * Retrieves all accounts in the database.
