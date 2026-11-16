@@ -8,37 +8,56 @@
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.bank.controller.HistoryController"
             stylesheets="@styles.css"
-            prefWidth="1150.0" prefHeight="760.0">
+            prefWidth="1260.0" prefHeight="840.0">
 
     <!-- LEFT SIDEBAR -->
     <left>
         <VBox styleClass="sidebar">
-            <VBox styleClass="sidebar-brand-box" spacing="4.0">
-                <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <Label text="🏦" style="-fx-font-size: 24px;"/>
-                    <VBox>
-                        <Text text="Apex Trust Bank" styleClass="brand-title"/>
-                        <Text text="Management System" styleClass="brand-subtitle"/>
+            <VBox styleClass="sidebar-brand-box" spacing="6.0">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <StackPane styleClass="brand-emblem-box">
+                        <Label text="🏦" style="-fx-font-size: 20px;"/>
+                    </StackPane>
+                    <VBox spacing="2.0">
+                        <Text text="APEX TRUST BANK" styleClass="brand-title"/>
+                        <Text text="Banking Beyond Expectations." styleClass="brand-tagline"/>
                     </VBox>
                 </HBox>
             </VBox>
 
-            <VBox styleClass="sidebar-nav-container" VBox.vgrow="ALWAYS" spacing="10.0">
-                <Button text="📊  Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="💳  Process Transactions" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+            <!-- Categorized Navigation Container -->
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="sidebar-nav-container" spacing="4.0">
+                    <!-- Section: OVERVIEW -->
+                    <Label text="OVERVIEW" styleClass="sidebar-category-label"/>
+                    <Button text="📊  Executive Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
 
-                <Region VBox.vgrow="ALWAYS"/>
+                    <!-- Section: BANKING OPERATIONS -->
+                    <Label text="BANKING OPERATIONS" styleClass="sidebar-category-label"/>
+                    <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="💳  Transaction Centre" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔁  Fund Transfers" onAction="#navToTransfers" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
 
-                <VBox styleClass="user-profile-card" spacing="4.0">
-                    <Text text="OPERATOR SESSION" style="-fx-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
-                    <Label fx:id="operatorNameLabel" text="Logged in as: Staff" style="-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                    <Label text="Module: Audit &amp; Compliance" style="-fx-text-fill: #93c5fd; -fx-font-size: 11px;"/>
+                    <!-- Section: MANAGEMENT -->
+                    <Label text="MANAGEMENT" styleClass="sidebar-category-label"/>
+                    <Button text="📑  Reports &amp; Statements" onAction="#navToReports" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔔  Notification Centre" onAction="#navToNotifications" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🛡️  Security Overview" onAction="#navToSecurity" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <Region prefHeight="16.0"/>
+
+                    <!-- Authenticated Operator Card -->
+                    <VBox styleClass="user-profile-card" spacing="4.0">
+                        <Text text="AUTHENTICATED OPERATOR" style="-fx-fill: #94A3B8; -fx-font-size: 9.5px; -fx-font-weight: 800; -fx-letter-spacing: 0.6px;"/>
+                        <Label fx:id="operatorNameLabel" text="Priya Nair (Branch Officer)" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-font-size: 12.5px;"/>
+                        <Label text="Module: Audit &amp; Compliance" style="-fx-text-fill: #93C5FD; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <!-- Logout Button -->
+                    <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
                 </VBox>
-
-                <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
-            </VBox>
+            </ScrollPane>
         </VBox>
     </left>
 
@@ -48,75 +67,113 @@
             <!-- Top Header -->
             <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
                 <VBox spacing="2.0">
-                    <Text text="Transaction Audit &amp; History Ledger" styleClass="heading-lg"/>
-                    <Label text="Immutable audit trail of all customer credits, debits, and transfers." styleClass="text-secondary"/>
+                    <Text text="Transaction Audit &amp; Clearing Ledger" styleClass="heading-lg"/>
+                    <Label text="Immutable audit trail of customer credits, debits, and transfers with multi-criteria filtering." styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox alignment="CENTER" styleClass="demo-banner">
-                    <Label fx:id="demoBadgeLabel" text="⚡ DEMO AUDIT ACTIVE" styleClass="demo-badge-text"/>
+                <HBox alignment="CENTER" spacing="12.0">
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="system-status-chip">
+                        <Label text="●" style="-fx-text-fill: #16A34A; -fx-font-size: 11px;"/>
+                        <Label text="System Operational" style="-fx-text-fill: #15803D; -fx-font-weight: bold; -fx-font-size: 11.5px;"/>
+                    </HBox>
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="date-chip">
+                        <Label text="📅" style="-fx-font-size: 12px;"/>
+                        <Label fx:id="currentDateLabel" text="12 Nov 2026" style="-fx-font-weight: bold; -fx-text-fill: #1E293B; -fx-font-size: 12px;"/>
+                    </HBox>
+                    <Button onAction="#navToNotifications" styleClass="header-icon-btn">
+                        <graphic>
+                            <Label text="🔔" style="-fx-font-size: 13px;"/>
+                        </graphic>
+                    </Button>
+                    <HBox alignment="CENTER" styleClass="demo-banner">
+                        <Label fx:id="demoBadgeLabel" text="⚡ In-Memory Demo" styleClass="demo-badge-text"/>
+                    </HBox>
                 </HBox>
             </HBox>
 
             <!-- Scrollable Content Area -->
-            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-                <VBox styleClass="content-area" spacing="20.0">
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="22.0">
+
+                    <!-- Export / Status Feedback Label -->
+                    <Label fx:id="statusFeedbackLabel" text="" wrapText="true" visible="false" managed="false"/>
 
                     <!-- Filter Control Card -->
                     <VBox styleClass="card" spacing="14.0">
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Text text="🔍 Filter &amp; Search Ledger" styleClass="heading-md"/>
+                            <Label text="🔍" style="-fx-font-size: 16px;"/>
+                            <Text text="Audit Filter &amp; Search Ledger" styleClass="heading-md"/>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Label fx:id="summaryCountLabel" text="Showing: 0 transactions" styleClass="text-secondary" style="-fx-font-weight: bold;"/>
                         </HBox>
 
-                        <HBox spacing="14.0" alignment="CENTER_LEFT">
+                        <GridPane hgap="14.0" vgap="12.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="25.0"/>
+                                <ColumnConstraints percentWidth="25.0"/>
+                                <ColumnConstraints percentWidth="20.0"/>
+                                <ColumnConstraints percentWidth="30.0"/>
+                            </columnConstraints>
+
                             <!-- Account Search -->
-                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-                                <Label text="Search by Account #" styleClass="form-label"/>
+                            <VBox GridPane.columnIndex="0" spacing="4.0">
+                                <Label text="Search Account #" styleClass="form-label"/>
                                 <TextField fx:id="accountFilterField" promptText="e.g. ACC-1001" onAction="#handleApplyFilter"/>
                             </VBox>
 
+                            <!-- Customer Search -->
+                            <VBox GridPane.columnIndex="1" spacing="4.0">
+                                <Label text="Search Customer Name" styleClass="form-label"/>
+                                <TextField fx:id="customerFilterField" promptText="e.g. Aarav Sharma" onAction="#handleApplyFilter"/>
+                            </VBox>
+
                             <!-- Type Filter -->
-                            <VBox spacing="4.0" prefWidth="200.0">
+                            <VBox GridPane.columnIndex="2" spacing="4.0">
                                 <Label text="Transaction Type" styleClass="form-label"/>
                                 <ComboBox fx:id="typeFilterCombo" maxWidth="Infinity" onAction="#handleApplyFilter"/>
                             </VBox>
 
-                            <!-- Filter Buttons -->
-                            <VBox spacing="4.0" alignment="BOTTOM_LEFT">
+                            <!-- Filter & Export Buttons -->
+                            <VBox GridPane.columnIndex="3" spacing="4.0" alignment="BOTTOM_LEFT">
                                 <Label text="" styleClass="form-label"/>
                                 <HBox spacing="8.0">
                                     <Button text="Apply Filter" onAction="#handleApplyFilter" styleClass="btn-primary"/>
                                     <Button text="Clear" onAction="#handleClearFilter" styleClass="btn-secondary"/>
+                                    <Button text="📥 Export CSV" onAction="#handleExportCSV" styleClass="btn-success"/>
                                 </HBox>
                             </VBox>
-                        </HBox>
+                        </GridPane>
                     </VBox>
 
                     <!-- TableView Card -->
                     <VBox styleClass="card" spacing="14.0">
                         <HBox alignment="CENTER_LEFT">
-                            <Text text="Ledger Records" styleClass="heading-md"/>
+                            <VBox spacing="2.0">
+                                <Text text="Audit Ledger Records" styleClass="heading-md"/>
+                                <Label text="Chronological list of all executed customer transactions with audit metadata" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                            </VBox>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Button text="🔄 Refresh Ledger" onAction="#handleRefresh" styleClass="btn-secondary"/>
                         </HBox>
 
-                        <TableView fx:id="historyTable" prefHeight="400.0">
+                        <TableView fx:id="historyTable" prefHeight="420.0">
                             <columns>
                                 <TableColumn fx:id="colTxId" text="Tx ID" prefWidth="90.0"/>
-                                <TableColumn fx:id="colTimestamp" text="Date &amp; Time" prefWidth="160.0"/>
-                                <TableColumn fx:id="colType" text="Type" prefWidth="120.0"/>
-                                <TableColumn fx:id="colSource" text="Source Account" prefWidth="140.0"/>
-                                <TableColumn fx:id="colDest" text="Destination Account" prefWidth="160.0"/>
+                                <TableColumn fx:id="colTimestamp" text="Date &amp; Time" prefWidth="155.0"/>
+                                <TableColumn fx:id="colSource" text="Account #" prefWidth="110.0"/>
+                                <TableColumn fx:id="colCustomer" text="Customer Name" prefWidth="150.0"/>
+                                <TableColumn fx:id="colDest" text="Destination Account" prefWidth="145.0"/>
+                                <TableColumn fx:id="colType" text="Type" prefWidth="125.0"/>
                                 <TableColumn fx:id="colAmount" text="Amount" prefWidth="130.0"/>
-                                <TableColumn fx:id="colBalanceAfter" text="Balance After" prefWidth="140.0"/>
-                                <TableColumn fx:id="colDescription" text="Memo / Description" prefWidth="200.0"/>
+                                <TableColumn fx:id="colBalanceAfter" text="Balance After" prefWidth="135.0"/>
+                                <TableColumn fx:id="colStatus" text="Status" prefWidth="110.0"/>
+                                <TableColumn fx:id="colDescription" text="Memo / Description" prefWidth="210.0"/>
                             </columns>
                             <placeholder>
-                                <VBox alignment="CENTER" spacing="8.0">
-                                    <Label text="📭" style="-fx-font-size: 28px;"/>
-                                    <Label text="No transaction records match the specified search criteria." style="-fx-font-weight: bold; -fx-text-fill: #64748b;"/>
-                                    <Label text="Try adjusting or clearing your filters." styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                                <VBox alignment="CENTER" spacing="8.0" style="-fx-padding: 30px;">
+                                    <Label text="📭" style="-fx-font-size: 30px;"/>
+                                    <Label text="No transaction records match the specified search criteria." style="-fx-font-weight: bold; -fx-text-fill: #64748B;"/>
+                                    <Label text="Try adjusting or clearing your filters." styleClass="text-muted" style="-fx-font-size: 11.5px;"/>
                                 </VBox>
                             </placeholder>
                         </TableView>

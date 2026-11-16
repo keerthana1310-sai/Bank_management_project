@@ -30,13 +30,17 @@ Developed as a college collaborative project with clean architectural tiering an
 
 ## 🎨 UI & Design Features
 
-- **Navy Blue Enterprise Palette:** Styled with custom CSS tokens (`styles.css`), clean contrast, rounded cards, and typography.
+- **Apex Trust Bank Enterprise Identity:** Styled with custom CSS tokens (`styles.css`), featuring Deep Midnight Navy (`#10243A`), Royal Blue (`#2563EB`), Emerald Green (`#16A34A`), Crisp White Cards (`#FFFFFF`), Indian Rupee (`₹`) currency formatting, and standard `DD MMM YYYY` dates.
 - **Responsive Layout:** Adaptive desktop layouts utilizing JavaFX `BorderPane`, `GridPane`, and `ScrollPane`.
 - **Branded Authentication Portal:** Login screen with staff authentication, demo credential shortcuts, and input validation.
-- **Operational Dashboard:** Real-time summary KPI cards (Total Accounts, Liquidity/Deposits, Total Transactions, Storage status) and recent activity ledger.
-- **Account Management Center:** Customer onboarding with email/phone regex checking, balance validation, real-time account telemetry inspector, and searchable directory table.
-- **Transaction Terminal:** Dynamic processing for Deposits, Withdrawals, and Wire Transfers with live balance previews and generated digital receipts.
-- **Immutable Transaction Ledger:** Comprehensive audit history with multi-criteria filtering by account and transaction type.
+- **Executive Operational Dashboard:** 4 KPI cards (Total Balance, Accounts, Transactions, Active Accounts) with comparative trend tags, 4 Native JavaFX Charts (Monthly Deposit vs Withdrawal, Transaction Volume Trend, Account Type Distribution, Account Status Distribution), and recent activity table.
+- **Customer 360 Account Center:** Customer onboarding with email/phone regex checking, balance validation, real-time account telemetry inspector, customer directory, and dynamic **Recent Transactions** table per selected account.
+- **Teller Operations Terminal:** Dynamic processing for Deposits, Withdrawals, and Wire Transfers with pre-submission confirmation cards, live balance previews, and generated digital receipts.
+- **Dedicated Fund Transfer & Remittance Center:** Saved beneficiary directory chips (Ananya Reddy, Priya Nair, Arjun Mehta, Karthik Iyer), instant pre-submission confirmation, and digital remittance receipts.
+- **Immutable Transaction Ledger & Audit Trail:** Comprehensive audit history with multi-criteria filtering by account, customer name, transaction type, and status, with one-click **CSV Ledger Export**.
+- **Reports & Financial Statements:** Statement generation for customer accounts, monthly cash flow summaries, deposit/withdrawal summaries, and one-click **CSV Report Export**.
+- **Notification & Operations Clearance Center:** Real-time stream of transaction clearances, account dormancy warnings, and compliance alerts with category filtering.
+- **Security Overview & Audit Telemetry:** Operator identity verification, cryptographic session monitoring, real-time balance integrity audit verification, and immutable security audit log export.
 
 ---
 
@@ -81,7 +85,7 @@ Double-click `run.bat` or run in terminal:
 | Username | Password | Role | Description |
 | :--- | :--- | :--- | :--- |
 | `admin` | `admin123` | Administrator | System Administrator access |
-| `keerthana` | `bank2026` | Branch Officer | Lead Branch Officer |
+| `priya` / `keerthana` | `bank2026` | Branch Officer | Lead Branch Officer session |
 | `teller` | `teller123` | Teller | Front Desk Teller |
 
 *(You can also simply click the "Quick Demo Credentials" chips on the Login screen!)*
@@ -115,7 +119,11 @@ java_project/
         │   │   ├── DashboardController.java
         │   │   ├── AccountController.java
         │   │   ├── TransactionController.java
-        │   │   └── HistoryController.java
+        │   │   ├── TransferController.java
+        │   │   ├── HistoryController.java
+        │   │   ├── ReportsController.java
+        │   │   ├── NotificationController.java
+        │   │   └── SecurityController.java
         │   │
         │   ├── model/                    # Data transfer & domain models
         │   │   ├── Account.java
@@ -143,7 +151,11 @@ java_project/
             ├── dashboard.fxml
             ├── account.fxml
             ├── transaction.fxml
+            ├── transfer.fxml
             ├── history.fxml
+            ├── reports.fxml
+            ├── notifications.fxml
+            ├── security.fxml
             └── styles.css
 ```
 

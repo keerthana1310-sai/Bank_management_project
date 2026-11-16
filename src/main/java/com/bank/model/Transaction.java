@@ -104,20 +104,34 @@ public class Transaction {
 
     // Presentation helpers for JavaFX TableView
     public String getFormattedAmount() {
-        if (amount == null) return "$0.00";
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
-        return currencyFormat.format(amount);
+        if (amount == null) return "₹0.00";
+        NumberFormat currencyFormat = NumberFormat.getNumberInstance(new Locale("en", "IN"));
+        currencyFormat.setMinimumFractionDigits(2);
+        currencyFormat.setMaximumFractionDigits(2);
+        return "₹" + currencyFormat.format(amount);
     }
 
     public String getFormattedBalanceAfter() {
-        if (balanceAfter == null) return "$0.00";
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
-        return currencyFormat.format(balanceAfter);
+        if (balanceAfter == null) return "₹0.00";
+        NumberFormat currencyFormat = NumberFormat.getNumberInstance(new Locale("en", "IN"));
+        currencyFormat.setMinimumFractionDigits(2);
+        currencyFormat.setMaximumFractionDigits(2);
+        return "₹" + currencyFormat.format(balanceAfter);
     }
 
     public String getFormattedTimestamp() {
         if (timestamp == null) return "";
-        return timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return timestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss"));
+    }
+
+    public String getFormattedDate() {
+        if (timestamp == null) return "";
+        return timestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
+    }
+
+    public String getFormattedDateOnly() {
+        if (timestamp == null) return "";
+        return timestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
     }
 
     public String getDisplayDestination() {

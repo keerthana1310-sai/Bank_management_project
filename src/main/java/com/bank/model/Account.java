@@ -130,14 +130,21 @@ public class Account {
 
     // Presentation helpers for JavaFX TableView bindings
     public String getFormattedBalance() {
-        if (balance == null) return "$0.00";
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
-        return currencyFormat.format(balance);
+        if (balance == null) return "₹0.00";
+        NumberFormat currencyFormat = NumberFormat.getNumberInstance(new Locale("en", "IN"));
+        currencyFormat.setMinimumFractionDigits(2);
+        currencyFormat.setMaximumFractionDigits(2);
+        return "₹" + currencyFormat.format(balance);
     }
 
     public String getFormattedDate() {
         if (createdAt == null) return "";
-        return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        return createdAt.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
+    }
+
+    public String getFormattedDateOnly() {
+        if (createdAt == null) return "";
+        return createdAt.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
     }
 
     @Override

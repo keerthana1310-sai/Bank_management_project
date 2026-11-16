@@ -20,22 +20,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DemoAccountService implements AccountService {
 
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
-    private final AtomicInteger accountSequence = new AtomicInteger(1005);
+    private final AtomicInteger accountSequence = new AtomicInteger(1009);
 
     public DemoAccountService() {
         seedSampleAccounts();
     }
 
     private void seedSampleAccounts() {
-        // Pre-populate realistic accounts for demonstration
-        addAccountInternal(new Account("ACC-1001", 1L, "Keerthana Rao", "keerthana@bank.com", "9876543210", 
-                "SAVINGS", new BigDecimal("12500.00"), "ACTIVE", LocalDateTime.now().minusDays(30)));
-        addAccountInternal(new Account("ACC-1002", 2L, "Pranita Sharma", "pranita@bank.com", "9876543211", 
-                "CURRENT", new BigDecimal("45000.00"), "ACTIVE", LocalDateTime.now().minusDays(20)));
-        addAccountInternal(new Account("ACC-1003", 3L, "Jayasree Patel", "jayasree@bank.com", "9876543212", 
-                "SAVINGS", new BigDecimal("8200.50"), "ACTIVE", LocalDateTime.now().minusDays(15)));
-        addAccountInternal(new Account("ACC-1004", 4L, "Yashaswi Reddy", "yashaswi@bank.com", "9876543213", 
-                "SAVINGS", new BigDecimal("19400.75"), "ACTIVE", LocalDateTime.now().minusDays(10)));
+        // Pre-populate realistic accounts for demonstration with fictional Indian customer names
+        addAccountInternal(new Account("ACC-1001", 1L, "Aarav Sharma", "aarav.sharma@apexbank.in", "9876543210", 
+                "SAVINGS", new BigDecimal("85500.00"), "ACTIVE", LocalDateTime.of(2026, 8, 15, 10, 30)));
+        addAccountInternal(new Account("ACC-1002", 2L, "Ananya Reddy", "ananya.reddy@apexbank.in", "9876543211", 
+                "CURRENT", new BigDecimal("245000.00"), "ACTIVE", LocalDateTime.of(2026, 8, 28, 11, 15)));
+        addAccountInternal(new Account("ACC-1003", 3L, "Rahul Varma", "rahul.varma@apexbank.in", "9876543212", 
+                "SAVINGS", new BigDecimal("62300.50"), "ACTIVE", LocalDateTime.of(2026, 9, 5, 9, 45)));
+        addAccountInternal(new Account("ACC-1004", 4L, "Priya Nair", "priya.nair@apexbank.in", "9876543213", 
+                "SAVINGS", new BigDecimal("115400.75"), "ACTIVE", LocalDateTime.of(2026, 9, 18, 14, 20)));
+        addAccountInternal(new Account("ACC-1005", 5L, "Arjun Mehta", "arjun.mehta@apexbank.in", "9876543214", 
+                "CURRENT", new BigDecimal("310000.00"), "ACTIVE", LocalDateTime.of(2026, 10, 2, 12, 0)));
+        addAccountInternal(new Account("ACC-1006", 6L, "Sneha Rao", "sneha.rao@apexbank.in", "9876543215", 
+                "SAVINGS", new BigDecimal("28500.00"), "INACTIVE", LocalDateTime.of(2026, 10, 15, 16, 30)));
+        addAccountInternal(new Account("ACC-1007", 7L, "Karthik Iyer", "karthik.iyer@apexbank.in", "9876543216", 
+                "SAVINGS", new BigDecimal("74800.00"), "ACTIVE", LocalDateTime.of(2026, 10, 25, 10, 0)));
+        addAccountInternal(new Account("ACC-1008", 8L, "Divya Sharma", "divya.sharma@apexbank.in", "9876543217", 
+                "CURRENT", new BigDecimal("180000.00"), "ACTIVE", LocalDateTime.of(2026, 11, 2, 15, 10)));
     }
 
     private void addAccountInternal(Account account) {

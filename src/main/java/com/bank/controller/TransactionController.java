@@ -17,35 +17,50 @@ import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Controller for Processing Financial Transactions (Deposit, Withdrawal, Transfer).
- * All monetary updates are performed strictly inside Jayasree's TransactionService.
+ * Controller for Bank Teller Transaction Processing Operations.
+ * Manages deposits, withdrawals, and wire transfers with live balance and confirmation preview.
  * 
- * Author: Keerthana (Frontend Lead)
+ * Redesigned for Apex Trust Bank Enterprise Architecture.
  */
 public class TransactionController implements Initializable {
 
     // Sidebar & Header
     @FXML private Label operatorNameLabel;
     @FXML private Label demoBadgeLabel;
+    @FXML private Label currentDateLabel;
     @FXML private Label statusAlertLabel;
 
     // Transaction Form
     @FXML private ComboBox<String> transactionTypeCombo;
     @FXML private TextField sourceAccountField;
+    @FXML private Label customerNameDisplayLabel;
     @FXML private VBox destAccountBox;
     @FXML private TextField destAccountField;
     @FXML private TextField amountField;
     @FXML private TextField descriptionField;
+    @FXML private TextField referenceField;
+    @FXML private TextField txDateField;
     @FXML private Button submitButton;
 
     // Source Preview
     @FXML private Label previewStatusLabel;
     @FXML private Label previewHolderLabel;
     @FXML private Label previewBalanceLabel;
+
+    // Confirmation Summary
+    @FXML private VBox confirmationCard;
+    @FXML private Label confirmTypeLabel;
+    @FXML private Label confirmSourceLabel;
+    @FXML private Label confirmHolderLabel;
+    @FXML private Label confirmDestLabel;
+    @FXML private Label confirmAmountLabel;
+    @FXML private Label confirmEstBalanceLabel;
 
     // Receipt Box
     @FXML private VBox receiptBox;
@@ -68,8 +83,24 @@ public class TransactionController implements Initializable {
         this.authService = ServiceFactory.getInstance().getAuthenticationService();
 
         // User & Badge
-        operatorNameLabel.setText(authService.getCurrentUser());
-        demoBadgeLabel.setText(ServiceFactory.getInstance().isDemoMode() ? "⚡ DEMO / JAYASREE READY" : "🔒 LIVE MYSQL");
+        String currentUser = authService != null ? authService.getCurrentUser() : "Priya Nair (Branch Officer)";
+        if (operatorNameLabel != null) {
+            operatorNameLabel.setText(currentUser);
+        }
+        if (demoBadgeLabel != null) {
+            demoBadgeLabel.setText(ServiceFactory.getInstance().isDemoMode() ? "⚡ In-Memory Demo" : "🔒 Live MySQL");
+        }
+        if (currentDateLabel != null) {
+            currentDateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+        }
+
+        // Init Transaction Date & Reference
+        if (txDateField != null) {
+            txDateField.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+        }
+        if (referenceField != null) {
+            referenceField.setText("ATB-TX-" + System.currentTimeMillis() % 1000000);
+        }
 
         // Init Transaction Types
         transactionTypeCombo.setItems(FXCollections.observableArrayList("DEPOSIT", "WITHDRAWAL", "TRANSFER"));
@@ -87,7 +118,7 @@ public class TransactionController implements Initializable {
         if ("TRANSFER".equalsIgnoreCase(selected)) {
             destAccountBox.setVisible(true);
             destAccountBox.setManaged(true);
-            submitButton.setText("⚡ Execute Wire Transfer");
+            submitButton.setText("⚡ Execute Fund Transfer");
         } else if ("WITHDRAWAL".equalsIgnoreCase(selected)) {
             destAccountBox.setVisible(false);
             destAccountBox.setManaged(false);
@@ -96,8 +127,9 @@ public class TransactionController implements Initializable {
             // DEPOSIT
             destAccountBox.setVisible(false);
             destAccountBox.setManaged(false);
-            submitButton.setText("📥 Process Deposit");
+            submitButton.setText("📥 Process Cash Deposit");
         }
+        updateConfirmationPreview();
     }
 
     @FXML
@@ -105,8 +137,11 @@ public class TransactionController implements Initializable {
         String srcAcc = sourceAccountField.getText();
         if (srcAcc == null || srcAcc.trim().isEmpty()) {
             previewStatusLabel.setText("No account entered");
+            previewStatusLabel.getStyleClass().clear();
             previewHolderLabel.setText("--");
-            previewBalanceLabel.setText("$0.00");
+            previewBalanceLabel.setText("₹0.00");
+            if (customerNameDisplayLabel != null) customerNameDisplayLabel.setText("—");
+            updateConfirmationPreview();
             return;
         }
 
@@ -117,20 +152,44 @@ public class TransactionController implements Initializable {
                 previewStatusLabel.setText(acc.getStatus());
                 previewHolderLabel.setText(acc.getCustomerName());
                 previewBalanceLabel.setText(acc.getFormattedBalance());
+                if (customerNameDisplayLabel != null) customerNameDisplayLabel.setText(acc.getCustomerName());
+
+                previewStatusLabel.getStyleClass().clear();
                 if ("ACTIVE".equalsIgnoreCase(acc.getStatus())) {
-                    previewStatusLabel.setStyle("-fx-text-fill: #15803d; -fx-font-weight: bold;");
+                    previewStatusLabel.getStyleClass().add("badge-active");
                 } else {
-                    previewStatusLabel.setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold;");
+                    previewStatusLabel.getStyleClass().add("badge-inactive");
                 }
             } else {
-                previewStatusLabel.setText("Not Found");
-                previewStatusLabel.setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold;");
+                previewStatusLabel.setText("NOT FOUND");
+                previewStatusLabel.getStyleClass().clear();
+                previewStatusLabel.getStyleClass().add("badge-inactive");
                 previewHolderLabel.setText("Unregistered Account");
-                previewBalanceLabel.setText("$0.00");
+                previewBalanceLabel.setText("₹0.00");
+                if (customerNameDisplayLabel != null) customerNameDisplayLabel.setText("Unregistered");
             }
         } catch (BankingException e) {
             previewStatusLabel.setText("Lookup Error");
         }
+        updateConfirmationPreview();
+    }
+
+    private void updateConfirmationPreview() {
+        if (confirmationCard == null) return;
+
+        String type = transactionTypeCombo != null ? transactionTypeCombo.getValue() : "DEPOSIT";
+        String src = sourceAccountField != null ? sourceAccountField.getText() : "";
+        String dest = destAccountField != null ? destAccountField.getText() : "—";
+        String amt = amountField != null ? amountField.getText() : "0.00";
+
+        if (confirmTypeLabel != null) confirmTypeLabel.setText(type);
+        if (confirmSourceLabel != null) confirmSourceLabel.setText(src.isBlank() ? "—" : src.toUpperCase());
+        if (confirmHolderLabel != null) confirmHolderLabel.setText(previewHolderLabel != null ? previewHolderLabel.getText() : "—");
+        if (confirmDestLabel != null) confirmDestLabel.setText("TRANSFER".equalsIgnoreCase(type) ? (dest.isBlank() ? "—" : dest.toUpperCase()) : "N/A (Cash Operation)");
+        if (confirmAmountLabel != null) confirmAmountLabel.setText("₹" + amt);
+
+        confirmationCard.setVisible(true);
+        confirmationCard.setManaged(true);
     }
 
     @FXML
@@ -155,7 +214,7 @@ public class TransactionController implements Initializable {
         // 2. Validation: Transfer destination
         if ("TRANSFER".equalsIgnoreCase(type)) {
             if (destAcc == null || destAcc.trim().isEmpty()) {
-                showError("Please enter the destination account number for funds transfer.");
+                showError("Please enter the destination account number for wire transfer.");
                 destAccountField.requestFocus();
                 return;
             }
@@ -177,17 +236,17 @@ public class TransactionController implements Initializable {
         try {
             amount = new BigDecimal(amountStr.trim());
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                showError("Transaction amount must be strictly greater than $0.00.");
+                showError("Transaction amount must be strictly greater than ₹0.00.");
                 amountField.requestFocus();
                 return;
             }
         } catch (NumberFormatException e) {
-            showError("Invalid monetary amount. Please enter a valid number (e.g. 150.00).");
+            showError("Invalid monetary amount. Please enter a valid number (e.g. 5000.00).");
             amountField.requestFocus();
             return;
         }
 
-        // 4. Delegate to Jayasree's TransactionService
+        // 4. Delegate to TransactionService
         try {
             Transaction completedTx;
             if ("DEPOSIT".equalsIgnoreCase(type)) {
@@ -212,6 +271,9 @@ public class TransactionController implements Initializable {
             // Clear amount and memo
             amountField.clear();
             descriptionField.clear();
+            if (referenceField != null) {
+                referenceField.setText("ATB-TX-" + System.currentTimeMillis() % 1000000);
+            }
 
         } catch (BankingException e) {
             showError("Transaction declined: " + e.getMessage());
@@ -220,12 +282,22 @@ public class TransactionController implements Initializable {
 
     private void displayReceipt(Transaction tx) {
         receiptTypeBadge.setText(tx.getTransactionType());
+        receiptTypeBadge.getStyleClass().clear();
+        String upper = tx.getTransactionType().toUpperCase();
+        if ("DEPOSIT".equals(upper)) {
+            receiptTypeBadge.getStyleClass().add("badge-deposit");
+        } else if ("WITHDRAWAL".equals(upper)) {
+            receiptTypeBadge.getStyleClass().add("badge-withdrawal");
+        } else {
+            receiptTypeBadge.getStyleClass().add("badge-transfer");
+        }
+
         receiptTxIdLabel.setText("#" + tx.getTransactionId());
         receiptSourceLabel.setText(tx.getSourceAccount());
         receiptDestLabel.setText(tx.getDisplayDestination());
         receiptAmountLabel.setText(tx.getFormattedAmount());
         receiptNewBalanceLabel.setText(tx.getFormattedBalanceAfter());
-        receiptTimestampLabel.setText(tx.getFormattedTimestamp());
+        receiptTimestampLabel.setText(tx.getFormattedDate());
 
         receiptBox.setVisible(true);
         receiptBox.setManaged(true);
@@ -239,6 +311,7 @@ public class TransactionController implements Initializable {
         receiptBox.setVisible(false);
         receiptBox.setManaged(false);
         clearAlert();
+        updateConfirmationPreview();
     }
 
     private void showSuccess(String msg) {
@@ -265,6 +338,10 @@ public class TransactionController implements Initializable {
     @FXML public void navToDashboard(ActionEvent e) { Main.navigateTo("dashboard.fxml", "Apex Trust Bank - Operational Dashboard"); }
     @FXML public void navToAccounts(ActionEvent e) { Main.navigateTo("account.fxml", "Apex Trust Bank - Account Management"); }
     @FXML public void navToTransactions(ActionEvent e) { /* already on page */ }
+    @FXML public void navToTransfers(ActionEvent e) { Main.navigateTo("transfer.fxml", "Apex Trust Bank - Fund Transfers & Beneficiaries"); }
     @FXML public void navToHistory(ActionEvent e) { Main.navigateTo("history.fxml", "Apex Trust Bank - Transaction Audit History"); }
+    @FXML public void navToReports(ActionEvent e) { Main.navigateTo("reports.fxml", "Apex Trust Bank - Reports & Statements"); }
+    @FXML public void navToNotifications(ActionEvent e) { Main.navigateTo("notifications.fxml", "Apex Trust Bank - Notification Centre"); }
+    @FXML public void navToSecurity(ActionEvent e) { Main.navigateTo("security.fxml", "Apex Trust Bank - Security Overview"); }
     @FXML public void handleLogout(ActionEvent e) { authService.logout(); Main.navigateTo("login.fxml", "Apex Trust Bank - Secure Staff Login"); }
 }

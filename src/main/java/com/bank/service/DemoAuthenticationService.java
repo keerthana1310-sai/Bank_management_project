@@ -9,27 +9,27 @@ package com.bank.service;
  */
 public class DemoAuthenticationService implements AuthenticationService {
 
-    private String currentUser = "Keerthana Rao (Lead Officer)";
+    private String currentUser = "Priya Nair (Branch Officer)";
 
     @Override
     public boolean authenticate(String username, String password) {
-        // Bypass mode: accept any credentials or default to Keerthana Rao
+        // Bypass mode: accept any credentials or default to Priya Nair
         if (username != null && !username.trim().isEmpty()) {
             this.currentUser = username.trim();
         } else {
-            this.currentUser = "Keerthana Rao (Lead Officer)";
+            this.currentUser = "Priya Nair (Branch Officer)";
         }
         return true;
     }
 
     @Override
     public String getCurrentUser() {
-        return (currentUser != null && !currentUser.isBlank()) ? currentUser : "Keerthana Rao (Lead Officer)";
+        return (currentUser != null && !currentUser.isBlank()) ? currentUser : "Priya Nair (Branch Officer)";
     }
 
     @Override
     public void logout() {
-        this.currentUser = "Keerthana Rao (Lead Officer)";
+        this.currentUser = "Priya Nair (Branch Officer)";
     }
 
     @Override

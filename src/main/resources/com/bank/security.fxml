@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bank.controller.SecurityController"
+            stylesheets="@styles.css"
+            prefWidth="1260.0" prefHeight="840.0">
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar-brand-box" spacing="6.0">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <StackPane styleClass="brand-emblem-box">
+                        <Label text="🏦" style="-fx-font-size: 20px;"/>
+                    </StackPane>
+                    <VBox spacing="2.0">
+                        <Text text="APEX TRUST BANK" styleClass="brand-title"/>
+                        <Text text="Banking Beyond Expectations." styleClass="brand-tagline"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="sidebar-nav-container" spacing="4.0">
+                    <!-- Section: OVERVIEW -->
+                    <Label text="OVERVIEW" styleClass="sidebar-category-label"/>
+                    <Button text="📊  Executive Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <!-- Section: BANKING OPERATIONS -->
+                    <Label text="BANKING OPERATIONS" styleClass="sidebar-category-label"/>
+                    <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="💳  Transaction Centre" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔁  Fund Transfers" onAction="#navToTransfers" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <!-- Section: MANAGEMENT -->
+                    <Label text="MANAGEMENT" styleClass="sidebar-category-label"/>
+                    <Button text="📑  Reports &amp; Statements" onAction="#navToReports" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔔  Notification Centre" onAction="#navToNotifications" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🛡️  Security Overview" onAction="#navToSecurity" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+
+                    <Region prefHeight="16.0"/>
+
+                    <VBox styleClass="user-profile-card" spacing="4.0">
+                        <Text text="AUTHENTICATED OPERATOR" style="-fx-fill: #94A3B8; -fx-font-size: 9.5px; -fx-font-weight: 800; -fx-letter-spacing: 0.6px;"/>
+                        <Label fx:id="operatorNameLabel" text="Priya Nair (Branch Officer)" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-font-size: 12.5px;"/>
+                        <Label text="Module: Security &amp; Audit Governance" style="-fx-text-fill: #93C5FD; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </left>
+
+    <!-- MAIN BODY -->
+    <center>
+        <VBox>
+            <!-- Top Header -->
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="2.0">
+                    <Text text="Security Overview &amp; System Integrity" styleClass="heading-lg"/>
+                    <Label text="Real-time operator governance, cryptographic session monitoring, and compliance audit trail." styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox alignment="CENTER" spacing="12.0">
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="system-status-chip">
+                        <Label text="●" style="-fx-text-fill: #16A34A; -fx-font-size: 11px;"/>
+                        <Label text="System Secured (TLS 1.3)" style="-fx-text-fill: #15803D; -fx-font-weight: bold; -fx-font-size: 11.5px;"/>
+                    </HBox>
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="date-chip">
+                        <Label text="📅" style="-fx-font-size: 12px;"/>
+                        <Label fx:id="currentDateLabel" text="12 Nov 2026" style="-fx-font-weight: bold; -fx-text-fill: #1E293B; -fx-font-size: 12px;"/>
+                    </HBox>
+                    <Button onAction="#navToNotifications" styleClass="header-icon-btn">
+                        <graphic>
+                            <Label text="🔔" style="-fx-font-size: 13px;"/>
+                        </graphic>
+                    </Button>
+                    <HBox alignment="CENTER" styleClass="demo-banner">
+                        <Label fx:id="demoBadgeLabel" text="⚡ In-Memory Demo" styleClass="demo-badge-text"/>
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <!-- Scrollable Content Area -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="22.0">
+
+                    <!-- Status Alert Feedback -->
+                    <Label fx:id="statusFeedbackLabel" text="" wrapText="true" visible="false" managed="false"/>
+
+                    <!-- Action Bar -->
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                        <VBox spacing="2.0">
+                            <Text text="Security Governance &amp; Compliance Center" styleClass="heading-md"/>
+                            <Label text="Continuous real-time audit ledger with cryptographic session isolation" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="🔍 Run Real-Time Integrity Audit" onAction="#handleRunIntegrityAudit" styleClass="btn-primary" style="-fx-padding: 9px 18px;"/>
+                        <Button text="📥 Export Security Audit Log (.CSV)" onAction="#handleExportAuditLog" styleClass="btn-outline" style="-fx-padding: 9px 16px;"/>
+                    </HBox>
+
+                    <!-- Top Governance Row: 2 Balanced Cards -->
+                    <GridPane hgap="18.0" vgap="18.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- Card 1: Operator Session -->
+                        <VBox GridPane.columnIndex="0" styleClass="card" spacing="14.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="🔐" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="2.0">
+                                    <Text text="Authenticated Operator Session" styleClass="heading-md"/>
+                                    <Label text="Current workstation session parameters and role credentials" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+
+                            <GridPane hgap="12.0" vgap="10.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="38.0"/>
+                                    <ColumnConstraints percentWidth="62.0"/>
+                                </columnConstraints>
+
+                                <Label text="Logged-In Operator:" styleClass="summary-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <Label fx:id="sessionOperatorLabel" text="Priya Nair" styleClass="summary-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Access Privilege Tier:" styleClass="summary-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <Label fx:id="sessionRoleLabel" text="Branch Operations Officer (Tier-3 Access)" styleClass="summary-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Session Auth Token:" styleClass="summary-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <Label fx:id="sessionTokenLabel" text="AUTH-TOKEN-ATB-9842" styleClass="summary-value" style="-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px; -fx-text-fill: #2563EB;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Host / Workstation:" styleClass="summary-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <Label fx:id="sessionHostLabel" text="127.0.0.1 (Terminal #04)" styleClass="summary-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                <Label text="Session Sign-In Time:" styleClass="summary-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <Label fx:id="sessionLoginTimeLabel" text="Today, 09:00:14 IST" styleClass="summary-value" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                <Label text="Authorization Status:" styleClass="summary-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                <HBox GridPane.rowIndex="5" GridPane.columnIndex="1" alignment="CENTER_LEFT">
+                                    <Label fx:id="sessionStatusBadge" text="ACTIVE &amp; VERIFIED" styleClass="badge, badge-success"/>
+                                </HBox>
+                            </GridPane>
+                        </VBox>
+
+                        <!-- Card 2: Core Banking Architecture -->
+                        <VBox GridPane.columnIndex="1" styleClass="card" spacing="14.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="🏛️" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="2.0">
+                                    <Text text="Banking Core &amp; Storage Architecture" styleClass="heading-md"/>
+                                    <Label text="Security configuration, persistence guarantee, and system uptime" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+
+                            <GridPane hgap="12.0" vgap="10.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="38.0"/>
+                                    <ColumnConstraints percentWidth="62.0"/>
+                                </columnConstraints>
+
+                                <Label text="Persistence Engine:" styleClass="summary-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <Label fx:id="sysModeLabel" text="In-Memory Thread-Safe Demo Architecture" styleClass="summary-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Transport Security:" styleClass="summary-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <Label fx:id="sysEncryptionLabel" text="TLS 1.3 / AES-256 GCM Payload Hash Simulation" styleClass="summary-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Transaction Guarantee:" styleClass="summary-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <Label fx:id="sysAcidLabel" text="Strict Serializability / Zero Concurrency Drift" styleClass="summary-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Platform Uptime:" styleClass="summary-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <Label text="99.99% Operational (Continuous branch session)" styleClass="summary-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                <Label text="Dual-Control Approval:" styleClass="summary-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <Label text="Enforced for transfers exceeding ₹1,00,000" styleClass="summary-value" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                <Label text="Core Engine State:" styleClass="summary-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                <HBox GridPane.rowIndex="5" GridPane.columnIndex="1" alignment="CENTER_LEFT" spacing="6.0">
+                                    <Label text="●" style="-fx-text-fill: #16A34A; -fx-font-size: 11px;"/>
+                                    <Label fx:id="sysStatusLabel" text="SYSTEM HEALTHY (100% Operational)" style="-fx-text-fill: #15803D; -fx-font-weight: bold; -fx-font-size: 11.5px;"/>
+                                </HBox>
+                            </GridPane>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- Account Security Governance KPI Cards -->
+                    <GridPane hgap="16.0" vgap="16.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="25.0"/>
+                            <ColumnConstraints percentWidth="25.0"/>
+                            <ColumnConstraints percentWidth="25.0"/>
+                            <ColumnConstraints percentWidth="25.0"/>
+                        </columnConstraints>
+
+                        <!-- Metric 1: Total Accounts -->
+                        <VBox GridPane.columnIndex="0" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <StackPane styleClass="kpi-icon-box" style="-fx-background-color: #EFF6FF;">
+                                    <Label text="👥" style="-fx-font-size: 16px;"/>
+                                </StackPane>
+                                <Label text="REGISTERED ACCOUNTS" styleClass="kpi-label"/>
+                            </HBox>
+                            <Label fx:id="metricTotalAccounts" text="8" styleClass="kpi-value"/>
+                            <Label text="All accounts actively monitored" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- Metric 2: Active Accounts -->
+                        <VBox GridPane.columnIndex="1" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <StackPane styleClass="kpi-icon-box" style="-fx-background-color: #F0FDF4;">
+                                    <Label text="✅" style="-fx-font-size: 16px;"/>
+                                </StackPane>
+                                <Label text="ACTIVE &amp; COMPLIANT" styleClass="kpi-label"/>
+                            </HBox>
+                            <Label fx:id="metricActiveAccounts" text="7" styleClass="kpi-value" style="-fx-text-fill: #16A34A;"/>
+                            <Label text="87.5% compliance ratio" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- Metric 3: Inactive Accounts -->
+                        <VBox GridPane.columnIndex="2" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <StackPane styleClass="kpi-icon-box" style="-fx-background-color: #FEF3C7;">
+                                    <Label text="⚠️" style="-fx-font-size: 16px;"/>
+                                </StackPane>
+                                <Label text="DORMANT / SUSPENDED" styleClass="kpi-label"/>
+                            </HBox>
+                            <Label fx:id="metricInactiveAccounts" text="1" styleClass="kpi-value" style="-fx-text-fill: #D97706;"/>
+                            <Label text="KYC renewal required" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- Metric 4: High Value Accounts -->
+                        <VBox GridPane.columnIndex="3" styleClass="kpi-card" spacing="8.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <StackPane styleClass="kpi-icon-box" style="-fx-background-color: #EFF6FF;">
+                                    <Label text="🛡️" style="-fx-font-size: 16px;"/>
+                                </StackPane>
+                                <Label text="HIGH-VALUE PORTFOLIO" styleClass="kpi-label"/>
+                            </HBox>
+                            <Label fx:id="metricHighValueAccounts" text="3 Accounts (≥ ₹2,00,000)" style="-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: #10243A;"/>
+                            <Label text="Enhanced AML transaction monitoring" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- Real-Time Audit Log Table -->
+                    <VBox styleClass="card" spacing="14.0">
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                            <Label text="📜" style="-fx-font-size: 18px;"/>
+                            <VBox spacing="2.0">
+                                <Text text="Real-Time Security &amp; Compliance Audit Trail" styleClass="heading-md"/>
+                                <Label text="Immutable chronological ledger of system activities, access events, and transaction validations" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                            </VBox>
+                        </HBox>
+                        <Separator/>
+
+                        <TableView fx:id="auditTable" prefHeight="300.0">
+                            <columns>
+                                <TableColumn fx:id="colTimestamp" text="Timestamp" prefWidth="170.0"/>
+                                <TableColumn fx:id="colEventType" text="Event Type" prefWidth="160.0"/>
+                                <TableColumn fx:id="colSeverity" text="Severity" prefWidth="100.0"/>
+                                <TableColumn fx:id="colOperator" text="Source / Operator" prefWidth="170.0"/>
+                                <TableColumn fx:id="colDetails" text="Audit Event Description &amp; Cryptographic Trace" prefWidth="430.0"/>
+                                <TableColumn fx:id="colStatus" text="Audit Status" prefWidth="120.0"/>
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Bottom Clearance Footer -->
+                    <HBox alignment="CENTER" spacing="10.0" style="-fx-padding: 8px 0 16px 0;">
+                        <Label text="🔒 Apex Trust Bank Security Gateway v4.2" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                        <Label text="•" styleClass="text-secondary"/>
+                        <Label text="RBI IT Governance &amp; Security Compliance Adherence" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                        <Label text="•" styleClass="text-secondary"/>
+                        <Label text="Zero Trust Network Architecture (ZTNA)" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                    </HBox>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
+

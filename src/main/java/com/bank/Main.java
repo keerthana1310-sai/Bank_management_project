@@ -20,7 +20,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
-        primaryStage.setMinWidth(1024);
+        primaryStage.setMinWidth(1080);
         primaryStage.setMinHeight(720);
         
         // Direct bypass to Dashboard
@@ -45,9 +45,13 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader(resource);
             Parent root = loader.load();
 
+            if (primaryStage == null) {
+                primaryStage = new Stage();
+            }
+
             Scene scene = primaryStage.getScene();
             if (scene == null) {
-                scene = new Scene(root, 1150, 760);
+                scene = new Scene(root, 1200, 800);
                 primaryStage.setScene(scene);
             } else {
                 scene.setRoot(root);

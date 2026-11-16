@@ -23,7 +23,7 @@ public class DemoTransactionService implements TransactionService {
 
     private final AccountService accountService;
     private final List<Transaction> transactionHistory = new CopyOnWriteArrayList<>();
-    private final AtomicLong transactionIdSequence = new AtomicLong(5001);
+    private final AtomicLong transactionIdSequence = new AtomicLong(5012);
 
     public DemoTransactionService(AccountService accountService) {
         this.accountService = accountService;
@@ -31,14 +31,40 @@ public class DemoTransactionService implements TransactionService {
     }
 
     private void seedSampleTransactions() {
-        transactionHistory.add(new Transaction(5001L, "DEPOSIT", "ACC-1001", null, 
-                new BigDecimal("5000.00"), new BigDecimal("12500.00"), "Initial Deposit", LocalDateTime.now().minusDays(25)));
+        // Chronological transactions spanning Aug-Nov 2026 (stored newest first)
+        transactionHistory.add(new Transaction(5011L, "DEPOSIT", "ACC-1001", null, 
+                new BigDecimal("15000.00"), new BigDecimal("85500.00"), "Cheque Clearance Deposit", 
+                LocalDateTime.of(2026, 11, 9, 10, 15)));
+        transactionHistory.add(new Transaction(5010L, "WITHDRAWAL", "ACC-1004", null, 
+                new BigDecimal("8000.00"), new BigDecimal("115400.75"), "Utility & Merchant Payment", 
+                LocalDateTime.of(2026, 11, 6, 13, 10)));
+        transactionHistory.add(new Transaction(5009L, "DEPOSIT", "ACC-1008", null, 
+                new BigDecimal("180000.00"), new BigDecimal("180000.00"), "Business Proceeds Deposit", 
+                LocalDateTime.of(2026, 11, 2, 15, 20)));
+        transactionHistory.add(new Transaction(5008L, "TRANSFER", "ACC-1005", "ACC-1007", 
+                new BigDecimal("25000.00"), new BigDecimal("285000.00"), "Vendor Payment Transfer", 
+                LocalDateTime.of(2026, 10, 28, 15, 30)));
+        transactionHistory.add(new Transaction(5007L, "WITHDRAWAL", "ACC-1003", null, 
+                new BigDecimal("10000.00"), new BigDecimal("62300.50"), "ATM Cash Withdrawal", 
+                LocalDateTime.of(2026, 10, 18, 11, 45)));
+        transactionHistory.add(new Transaction(5006L, "DEPOSIT", "ACC-1005", null, 
+                new BigDecimal("310000.00"), new BigDecimal("310000.00"), "Commercial Client Deposit", 
+                LocalDateTime.of(2026, 10, 2, 12, 15)));
+        transactionHistory.add(new Transaction(5005L, "WITHDRAWAL", "ACC-1002", null, 
+                new BigDecimal("25000.00"), new BigDecimal("245000.00"), "Branch Cash Withdrawal", 
+                LocalDateTime.of(2026, 9, 29, 16, 15)));
+        transactionHistory.add(new Transaction(5004L, "TRANSFER", "ACC-1001", "ACC-1004", 
+                new BigDecimal("15000.00"), new BigDecimal("70500.00"), "Consulting Remittance", 
+                LocalDateTime.of(2026, 9, 20, 14, 30)));
+        transactionHistory.add(new Transaction(5003L, "DEPOSIT", "ACC-1003", null, 
+                new BigDecimal("40000.00"), new BigDecimal("72300.50"), "Salary Direct Credit", 
+                LocalDateTime.of(2026, 9, 5, 10, 0)));
         transactionHistory.add(new Transaction(5002L, "DEPOSIT", "ACC-1002", null, 
-                new BigDecimal("45000.00"), new BigDecimal("45000.00"), "Corporate Opening Balance", LocalDateTime.now().minusDays(18)));
-        transactionHistory.add(new Transaction(5003L, "TRANSFER", "ACC-1001", "ACC-1003", 
-                new BigDecimal("500.00"), new BigDecimal("12000.00"), "College Project Team Fund", LocalDateTime.now().minusDays(10)));
-        transactionHistory.add(new Transaction(5004L, "WITHDRAWAL", "ACC-1004", null, 
-                new BigDecimal("600.00"), new BigDecimal("19400.75"), "ATM Cash Withdrawal", LocalDateTime.now().minusDays(3)));
+                new BigDecimal("200000.00"), new BigDecimal("270000.00"), "Working Capital Deposit", 
+                LocalDateTime.of(2026, 8, 28, 11, 20)));
+        transactionHistory.add(new Transaction(5001L, "DEPOSIT", "ACC-1001", null, 
+                new BigDecimal("50000.00"), new BigDecimal("50000.00"), "Initial Account Opening Deposit", 
+                LocalDateTime.of(2026, 8, 15, 10, 35)));
     }
 
     @Override

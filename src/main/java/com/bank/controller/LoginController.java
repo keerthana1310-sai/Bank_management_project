@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 
 /**
  * Controller for the Login screen.
- * Author: Keerthana (Frontend Lead)
+ * Redesigned for Apex Trust Bank Enterprise Architecture.
  */
 public class LoginController implements Initializable {
 
@@ -59,17 +59,23 @@ public class LoginController implements Initializable {
         String password = passwordField.getText();
 
         if (username == null || username.trim().isEmpty()) {
-            username = "Keerthana Rao (Lead Officer)";
+            username = "Priya Nair (Branch Officer)";
+        } else if ("admin".equalsIgnoreCase(username.trim())) {
+            username = "Aarav Sharma (System Admin)";
+        } else if ("keerthana".equalsIgnoreCase(username.trim()) || "priya".equalsIgnoreCase(username.trim())) {
+            username = "Priya Nair (Branch Officer)";
+        } else if ("teller".equalsIgnoreCase(username.trim())) {
+            username = "Karthik Iyer (Front Desk Teller)";
         }
 
-        // Always authenticate and grant access to dashboard
+        // Authenticate and grant access to dashboard
         authService.authenticate(username, password);
         Main.navigateTo("dashboard.fxml", "Apex Trust Bank - Operational Dashboard");
     }
 
     @FXML
     public void handleBypass(ActionEvent event) {
-        authService.authenticate("Keerthana Rao (Lead Officer)", "bypass");
+        authService.authenticate("Priya Nair (Branch Officer)", "bypass");
         Main.navigateTo("dashboard.fxml", "Apex Trust Bank - Operational Dashboard");
     }
 
@@ -82,7 +88,7 @@ public class LoginController implements Initializable {
 
     @FXML
     public void fillKeerthanaCredentials(ActionEvent event) {
-        usernameField.setText("keerthana");
+        usernameField.setText("priya");
         passwordField.setText("bank2026");
         clearMessage();
     }

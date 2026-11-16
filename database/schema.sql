@@ -83,26 +83,39 @@ CREATE TABLE IF NOT EXISTS users (
 -- SEED DATA (For local development and testing)
 -- -------------------------------------------------------------------
 INSERT IGNORE INTO customers (customer_id, name, email, phone, address) VALUES
-(1, 'Keerthana Rao', 'keerthana@bank.com', '9876543210', '124 College Boulevard, Suite 4A'),
-(2, 'Pranita Sharma', 'pranita@bank.com', '9876543211', '88 University Avenue'),
-(3, 'Jayasree Patel', 'jayasree@bank.com', '9876543212', '45 Tech Park Road'),
-(4, 'Yashaswi Reddy', 'yashaswi@bank.com', '9876543213', '10 Innovation Drive');
+(1, 'Aarav Sharma', 'aarav.sharma@apexbank.in', '9876543210', '42 MG Road, Bengaluru, Karnataka'),
+(2, 'Ananya Reddy', 'ananya.reddy@apexbank.in', '9876543211', '15 Jubilee Hills, Hyderabad, Telangana'),
+(3, 'Rahul Varma', 'rahul.varma@apexbank.in', '9876543212', '88 Bandra West, Mumbai, Maharashtra'),
+(4, 'Priya Nair', 'priya.nair@apexbank.in', '9876543213', '24 Marine Drive, Kochi, Kerala'),
+(5, 'Arjun Mehta', 'arjun.mehta@apexbank.in', '9876543214', '7 Park Street, Kolkata, West Bengal'),
+(6, 'Sneha Rao', 'sneha.rao@apexbank.in', '9876543215', '120 Anna Nagar, Chennai, Tamil Nadu'),
+(7, 'Karthik Iyer', 'karthik.iyer@apexbank.in', '9876543216', '33 Koregaon Park, Pune, Maharashtra'),
+(8, 'Divya Sharma', 'divya.sharma@apexbank.in', '9876543217', '55 Civil Lines, Jaipur, Rajasthan');
 
 INSERT IGNORE INTO accounts (account_number, customer_id, customer_name, email, phone, account_type, balance, status, created_at) VALUES
-('ACC-1001', 1, 'Keerthana Rao', 'keerthana@bank.com', '9876543210', 'SAVINGS', 12500.00, 'ACTIVE', '2026-09-01 10:00:00'),
-('ACC-1002', 2, 'Pranita Sharma', 'pranita@bank.com', '9876543211', 'CURRENT', 45000.00, 'ACTIVE', '2026-09-15 11:30:00'),
-('ACC-1003', 3, 'Jayasree Patel', 'jayasree@bank.com', '9876543212', 'SAVINGS', 8200.50, 'ACTIVE', '2026-10-01 14:15:00'),
-('ACC-1004', 4, 'Yashaswi Reddy', 'yashaswi@bank.com', '9876543213', 'SAVINGS', 19400.75, 'ACTIVE', '2026-10-10 16:45:00');
+('ACC-1001', 1, 'Aarav Sharma', 'aarav.sharma@apexbank.in', '9876543210', 'SAVINGS', 85500.00, 'ACTIVE', '2026-08-15 10:30:00'),
+('ACC-1002', 2, 'Ananya Reddy', 'ananya.reddy@apexbank.in', '9876543211', 'CURRENT', 245000.00, 'ACTIVE', '2026-08-28 11:15:00'),
+('ACC-1003', 3, 'Rahul Varma', 'rahul.varma@apexbank.in', '9876543212', 'SAVINGS', 62300.50, 'ACTIVE', '2026-09-05 09:45:00'),
+('ACC-1004', 4, 'Priya Nair', 'priya.nair@apexbank.in', '9876543213', 'SAVINGS', 115400.75, 'ACTIVE', '2026-09-18 14:20:00'),
+('ACC-1005', 5, 'Arjun Mehta', 'arjun.mehta@apexbank.in', '9876543214', 'CURRENT', 310000.00, 'ACTIVE', '2026-10-02 12:00:00'),
+('ACC-1006', 6, 'Sneha Rao', 'sneha.rao@apexbank.in', '9876543215', 'SAVINGS', 28500.00, 'INACTIVE', '2026-10-15 16:30:00'),
+('ACC-1007', 7, 'Karthik Iyer', 'karthik.iyer@apexbank.in', '9876543216', 'SAVINGS', 74800.00, 'ACTIVE', '2026-10-25 10:00:00'),
+('ACC-1008', 8, 'Divya Sharma', 'divya.sharma@apexbank.in', '9876543217', 'CURRENT', 180000.00, 'ACTIVE', '2026-11-02 15:10:00');
 
 INSERT IGNORE INTO transactions (transaction_id, transaction_type, source_account, destination_account, amount, balance_after, description, timestamp) VALUES
-(5001, 'DEPOSIT', 'ACC-1001', NULL, 5000.00, 12500.00, 'Initial Deposit', '2026-09-01 10:05:00'),
-(5002, 'DEPOSIT', 'ACC-1002', NULL, 45000.00, 45000.00, 'Corporate Opening Balance', '2026-09-15 11:35:00'),
-(5003, 'TRANSFER', 'ACC-1001', 'ACC-1003', 500.00, 12000.00, 'College Project Team Fund', '2026-10-05 09:30:00'),
-(5004, 'WITHDRAWAL', 'ACC-1004', NULL, 600.00, 19400.75, 'ATM Cash Withdrawal', '2026-10-15 17:20:00');
+(5001, 'DEPOSIT', 'ACC-1001', NULL, 50000.00, 50000.00, 'Initial Account Opening Deposit', '2026-08-15 10:35:00'),
+(5002, 'DEPOSIT', 'ACC-1002', NULL, 200000.00, 270000.00, 'Working Capital Deposit', '2026-08-28 11:20:00'),
+(5003, 'DEPOSIT', 'ACC-1003', NULL, 40000.00, 72300.50, 'Salary Direct Credit', '2026-09-05 10:00:00'),
+(5004, 'TRANSFER', 'ACC-1001', 'ACC-1004', 15000.00, 70500.00, 'Consulting Remittance', '2026-09-20 14:30:00'),
+(5005, 'WITHDRAWAL', 'ACC-1002', NULL, 25000.00, 245000.00, 'Branch Cash Withdrawal', '2026-09-29 16:15:00'),
+(5006, 'DEPOSIT', 'ACC-1005', NULL, 310000.00, 310000.00, 'Commercial Client Deposit', '2026-10-02 12:15:00'),
+(5007, 'WITHDRAWAL', 'ACC-1003', NULL, 10000.00, 62300.50, 'ATM Cash Withdrawal', '2026-10-18 11:45:00'),
+(5008, 'TRANSFER', 'ACC-1005', 'ACC-1007', 25000.00, 285000.00, 'Vendor Payment Transfer', '2026-10-28 15:30:00'),
+(5009, 'DEPOSIT', 'ACC-1008', NULL, 180000.00, 180000.00, 'Business Proceeds Deposit', '2026-11-02 15:20:00'),
+(5010, 'WITHDRAWAL', 'ACC-1004', NULL, 8000.00, 115400.75, 'Utility & Merchant Payment', '2026-11-06 13:10:00'),
+(5011, 'DEPOSIT', 'ACC-1001', NULL, 15000.00, 85500.00, 'Cheque Clearance Deposit', '2026-11-09 10:15:00');
 
 INSERT IGNORE INTO users (username, password_hash, full_name, role) VALUES
 ('admin', 'admin123', 'System Administrator', 'ADMIN'),
-('keerthana', 'bank2026', 'Keerthana Rao (Lead)', 'TELLER'),
-('pranita', 'pranita123', 'Pranita Sharma', 'TELLER'),
-('jayasree', 'jayasree123', 'Jayasree Patel', 'TELLER'),
-('yashaswi', 'yashaswi123', 'Yashaswi Reddy', 'TELLER');
+('priya', 'bank2026', 'Priya Nair (Branch Officer)', 'TELLER'),
+('teller', 'teller123', 'Front Desk Teller', 'TELLER');

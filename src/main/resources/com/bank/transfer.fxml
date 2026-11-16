@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bank.controller.TransferController"
+            stylesheets="@styles.css"
+            prefWidth="1260.0" prefHeight="840.0">
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar-brand-box" spacing="6.0">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <StackPane styleClass="brand-emblem-box">
+                        <Label text="🏦" style="-fx-font-size: 20px;"/>
+                    </StackPane>
+                    <VBox spacing="2.0">
+                        <Text text="APEX TRUST BANK" styleClass="brand-title"/>
+                        <Text text="Banking Beyond Expectations." styleClass="brand-tagline"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="sidebar-nav-container" spacing="4.0">
+                    <!-- Section: OVERVIEW -->
+                    <Label text="OVERVIEW" styleClass="sidebar-category-label"/>
+                    <Button text="📊  Executive Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <!-- Section: BANKING OPERATIONS -->
+                    <Label text="BANKING OPERATIONS" styleClass="sidebar-category-label"/>
+                    <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="💳  Transaction Centre" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔁  Fund Transfers" onAction="#navToTransfers" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
+                    <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <!-- Section: MANAGEMENT -->
+                    <Label text="MANAGEMENT" styleClass="sidebar-category-label"/>
+                    <Button text="📑  Reports &amp; Statements" onAction="#navToReports" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔔  Notification Centre" onAction="#navToNotifications" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🛡️  Security Overview" onAction="#navToSecurity" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <Region prefHeight="16.0"/>
+
+                    <VBox styleClass="user-profile-card" spacing="4.0">
+                        <Text text="AUTHENTICATED OPERATOR" style="-fx-fill: #94A3B8; -fx-font-size: 9.5px; -fx-font-weight: 800; -fx-letter-spacing: 0.6px;"/>
+                        <Label fx:id="operatorNameLabel" text="Priya Nair (Branch Officer)" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-font-size: 12.5px;"/>
+                        <Label text="Module: Remittance &amp; Wire Clearing" style="-fx-text-fill: #93C5FD; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </left>
+
+    <!-- MAIN BODY -->
+    <center>
+        <VBox>
+            <!-- Top Header -->
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="2.0">
+                    <Text text="Fund Transfers &amp; Beneficiary Remittance" styleClass="heading-lg"/>
+                    <Label text="Instant intra-bank wire settlements, beneficiary directory management, and dual-authorization clearing." styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox alignment="CENTER" spacing="12.0">
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="system-status-chip">
+                        <Label text="●" style="-fx-text-fill: #16A34A; -fx-font-size: 11px;"/>
+                        <Label text="Wire Clearing Operational" style="-fx-text-fill: #15803D; -fx-font-weight: bold; -fx-font-size: 11.5px;"/>
+                    </HBox>
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="date-chip">
+                        <Label text="📅" style="-fx-font-size: 12px;"/>
+                        <Label fx:id="currentDateLabel" text="12 Nov 2026" style="-fx-font-weight: bold; -fx-text-fill: #1E293B; -fx-font-size: 12px;"/>
+                    </HBox>
+                    <Button onAction="#navToNotifications" styleClass="header-icon-btn">
+                        <graphic>
+                            <Label text="🔔" style="-fx-font-size: 13px;"/>
+                        </graphic>
+                    </Button>
+                    <HBox alignment="CENTER" styleClass="demo-banner">
+                        <Label fx:id="demoBadgeLabel" text="⚡ In-Memory Demo" styleClass="demo-badge-text"/>
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <!-- Scrollable Content -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="22.0">
+
+                    <!-- Global Alert Notification -->
+                    <Label fx:id="statusAlertLabel" text="" wrapText="true" visible="false" managed="false"/>
+
+                    <GridPane hgap="22.0" vgap="20.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="52.0"/>
+                            <ColumnConstraints percentWidth="48.0"/>
+                        </columnConstraints>
+
+                        <!-- Card 1: Wire Transfer Form -->
+                        <VBox GridPane.columnIndex="0" styleClass="card" spacing="16.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="🔁" style="-fx-font-size: 20px;"/>
+                                <VBox spacing="2.0">
+                                    <Text text="Initiate Wire Transfer" styleClass="heading-md"/>
+                                    <Label text="Direct account-to-account funds settlement" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+
+                            <!-- Sender Account Input -->
+                            <VBox spacing="4.0">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Debit Account (Sender) *" styleClass="form-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Hyperlink text="Verify Balance" onAction="#handleCheckSender" style="-fx-font-size: 11px; -fx-text-fill: #2563EB; -fx-font-weight: bold;"/>
+                                </HBox>
+                                <TextField fx:id="senderAccountField" promptText="e.g. ACC-1001" onAction="#handleCheckSender"/>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #F8FAFC; -fx-padding: 8px 12px; -fx-background-radius: 6px;">
+                                    <Label text="Holder:" style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+                                    <Label fx:id="senderHolderLabel" text="Aarav Sharma (ACTIVE)" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="Available:" style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+                                    <Label fx:id="senderBalanceLabel" text="₹85,500.00" style="-fx-font-size: 11.5px; -fx-font-weight: bold; -fx-text-fill: #16A34A;"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Beneficiary Details -->
+                            <GridPane hgap="12.0" vgap="10.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50.0"/>
+                                    <ColumnConstraints percentWidth="50.0"/>
+                                </columnConstraints>
+
+                                <VBox GridPane.columnIndex="0" spacing="4.0">
+                                    <Label text="Beneficiary Name *" styleClass="form-label"/>
+                                    <TextField fx:id="beneficiaryNameField" promptText="e.g. Ananya Reddy"/>
+                                </VBox>
+
+                                <VBox GridPane.columnIndex="1" spacing="4.0">
+                                    <Label text="Beneficiary Account # *" styleClass="form-label"/>
+                                    <TextField fx:id="beneficiaryAccountField" promptText="e.g. ACC-1002"/>
+                                </VBox>
+                            </GridPane>
+
+                            <!-- Transfer Amount -->
+                            <VBox spacing="4.0">
+                                <Label text="Transfer Amount (₹) *" styleClass="form-label"/>
+                                <TextField fx:id="transferAmountField" promptText="e.g. 15000.00 (Must be strictly positive)"/>
+                            </VBox>
+
+                            <!-- Transfer Remarks -->
+                            <VBox spacing="4.0">
+                                <Label text="Transfer Remarks / Purpose *" styleClass="form-label"/>
+                                <TextField fx:id="transferRemarksField" promptText="e.g. Vendor settlement, commercial invoice, tuition payment"/>
+                            </VBox>
+
+                            <!-- Action Buttons -->
+                            <HBox spacing="14.0" alignment="CENTER_LEFT">
+                                <Button text="⚡ Authorize &amp; Execute Wire Transfer" onAction="#handleExecuteTransfer" styleClass="btn-primary" style="-fx-font-size: 13.5px; -fx-padding: 10px 22px;"/>
+                                <Button text="Reset" onAction="#handleReset" styleClass="btn-secondary"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Card 2: Beneficiary Directory & Confirmation & Digital Receipt -->
+                        <VBox GridPane.columnIndex="1" spacing="18.0">
+
+                            <!-- Quick Select Saved Beneficiaries -->
+                            <VBox styleClass="card" spacing="12.0">
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <Label text="👥" style="-fx-font-size: 16px;"/>
+                                    <VBox spacing="1.0">
+                                        <Text text="Frequent Beneficiaries Directory" styleClass="heading-md"/>
+                                        <Label text="Click any beneficiary to pre-fill destination account details" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                                    </VBox>
+                                </HBox>
+                                <Separator/>
+                                <VBox spacing="8.0">
+                                    <!-- Beneficiary 1 -->
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="beneficiary-pill">
+                                        <StackPane styleClass="avatar-badge" style="-fx-background-color: #3B82F6;">
+                                            <Label text="AR" style="-fx-text-fill: #FFFFFF; -fx-font-size: 9.5px; -fx-font-weight: 800;"/>
+                                        </StackPane>
+                                        <VBox spacing="1.0">
+                                            <Label text="Ananya Reddy" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                            <Label text="ACC-1002 • Current Account" style="-fx-text-fill: #64748B; -fx-font-size: 10.5px;"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Select" onAction="#selectBenAnanya" styleClass="btn-secondary" style="-fx-font-size: 10.5px; -fx-padding: 4px 10px;"/>
+                                    </HBox>
+
+                                    <!-- Beneficiary 2 -->
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="beneficiary-pill">
+                                        <StackPane styleClass="avatar-badge" style="-fx-background-color: #10B981;">
+                                            <Label text="PN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 9.5px; -fx-font-weight: 800;"/>
+                                        </StackPane>
+                                        <VBox spacing="1.0">
+                                            <Label text="Priya Nair" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                            <Label text="ACC-1004 • Savings Account" style="-fx-text-fill: #64748B; -fx-font-size: 10.5px;"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Select" onAction="#selectBenPriya" styleClass="btn-secondary" style="-fx-font-size: 10.5px; -fx-padding: 4px 10px;"/>
+                                    </HBox>
+
+                                    <!-- Beneficiary 3 -->
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="beneficiary-pill">
+                                        <StackPane styleClass="avatar-badge" style="-fx-background-color: #8B5CF6;">
+                                            <Label text="AM" style="-fx-text-fill: #FFFFFF; -fx-font-size: 9.5px; -fx-font-weight: 800;"/>
+                                        </StackPane>
+                                        <VBox spacing="1.0">
+                                            <Label text="Arjun Mehta" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                            <Label text="ACC-1005 • Current Account" style="-fx-text-fill: #64748B; -fx-font-size: 10.5px;"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Select" onAction="#selectBenArjun" styleClass="btn-secondary" style="-fx-font-size: 10.5px; -fx-padding: 4px 10px;"/>
+                                    </HBox>
+
+                                    <!-- Beneficiary 4 -->
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="beneficiary-pill">
+                                        <StackPane styleClass="avatar-badge" style="-fx-background-color: #F59E0B;">
+                                            <Label text="KI" style="-fx-text-fill: #FFFFFF; -fx-font-size: 9.5px; -fx-font-weight: 800;"/>
+                                        </StackPane>
+                                        <VBox spacing="1.0">
+                                            <Label text="Karthik Iyer" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                            <Label text="ACC-1007 • Savings Account" style="-fx-text-fill: #64748B; -fx-font-size: 10.5px;"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Select" onAction="#selectBenKarthik" styleClass="btn-secondary" style="-fx-font-size: 10.5px; -fx-padding: 4px 10px;"/>
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+
+                            <!-- Confirmation Summary Card -->
+                            <VBox fx:id="confirmationCard" styleClass="confirmation-summary-card" spacing="10.0">
+                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                    <Label text="📋" style="-fx-font-size: 15px;"/>
+                                    <Text text="Wire Settlement Preview" styleClass="heading-md" style="-fx-fill: #1E3A8A; -fx-font-size: 13px;"/>
+                                </HBox>
+                                <Separator/>
+                                <GridPane vgap="5.0" hgap="10.0">
+                                    <Label text="Sender (Debit):" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="confirmSenderLabel" text="ACC-1001" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+
+                                    <Label text="Beneficiary (Credit):" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="confirmBeneficiaryLabel" text="—" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+
+                                    <Label text="Transfer Volume:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="confirmAmountLabel" text="₹0.00" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #2563EB; -fx-font-size: 13px;"/>
+
+                                    <Label text="Purpose / Remarks:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="confirmRemarksLabel" text="Direct Wire Transfer" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #334155;"/>
+                                </GridPane>
+                            </VBox>
+
+                            <!-- Digital Transfer Receipt Card (on success) -->
+                            <VBox fx:id="receiptBox" styleClass="card" spacing="12.0" style="-fx-border-color: #16A34A; -fx-border-width: 1.5;" visible="false" managed="false">
+                                <HBox alignment="CENTER_LEFT">
+                                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                        <Label text="✅" style="-fx-font-size: 18px;"/>
+                                        <Text text="Wire Settlement Receipt" styleClass="heading-md" style="-fx-fill: #065F46; -fx-font-size: 14px;"/>
+                                    </HBox>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="SETTLED" styleClass="badge-completed"/>
+                                </HBox>
+                                <Separator/>
+                                <GridPane vgap="7.0" hgap="10.0">
+                                    <Label text="Settlement / TX ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="receiptTxIdLabel" text="#5013" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #0F172A;"/>
+
+                                    <Label text="Origin Account:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="receiptSenderLabel" text="ACC-1001" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+
+                                    <Label text="Beneficiary Credited:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="receiptBeneficiaryLabel" text="ACC-1002 (Ananya Reddy)" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+
+                                    <Label text="Amount Cleared:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="receiptAmountLabel" text="₹15,000.00" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2563EB;"/>
+
+                                    <Label text="Sender Ledger Balance:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="receiptNewBalanceLabel" text="₹70,500.00" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #16A34A;"/>
+
+                                    <Label text="Clearing Timestamp:" GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                    <Label fx:id="receiptTimestampLabel" text="12 Nov 2026, 14:10" GridPane.rowIndex="5" GridPane.columnIndex="1" style="-fx-text-fill: #64748B; -fx-font-size: 11px;"/>
+                                </GridPane>
+                            </VBox>
+
+                        </VBox>
+                    </GridPane>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
+

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -8,41 +9,57 @@
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.bank.controller.DashboardController"
             stylesheets="@styles.css"
-            prefWidth="1150.0" prefHeight="760.0">
+            prefWidth="1260.0" prefHeight="840.0">
 
     <!-- LEFT SIDEBAR -->
     <left>
         <VBox styleClass="sidebar">
-            <!-- Brand Section -->
-            <VBox styleClass="sidebar-brand-box" spacing="4.0">
-                <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <Label text="🏦" style="-fx-font-size: 24px;"/>
-                    <VBox>
-                        <Text text="Apex Trust Bank" styleClass="brand-title"/>
-                        <Text text="Management System" styleClass="brand-subtitle"/>
+            <!-- Bank Branding -->
+            <VBox styleClass="sidebar-brand-box" spacing="6.0">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <StackPane styleClass="brand-emblem-box">
+                        <Label text="🏦" style="-fx-font-size: 20px;"/>
+                    </StackPane>
+                    <VBox spacing="2.0">
+                        <Text text="APEX TRUST BANK" styleClass="brand-title"/>
+                        <Text text="Banking Beyond Expectations." styleClass="brand-tagline"/>
                     </VBox>
                 </HBox>
             </VBox>
 
-            <!-- Navigation Links -->
-            <VBox styleClass="sidebar-nav-container" VBox.vgrow="ALWAYS" spacing="10.0">
-                <Button text="📊  Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
-                <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="💳  Process Transactions" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
+            <!-- Categorized Navigation Container -->
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                <VBox styleClass="sidebar-nav-container" spacing="4.0">
+                    <!-- Section: OVERVIEW -->
+                    <Label text="OVERVIEW" styleClass="sidebar-category-label"/>
+                    <Button text="📊  Executive Dashboard" onAction="#navToDashboard" maxWidth="Infinity" styleClass="nav-button, nav-button-active"/>
 
-                <Region VBox.vgrow="ALWAYS"/>
+                    <!-- Section: BANKING OPERATIONS -->
+                    <Label text="BANKING OPERATIONS" styleClass="sidebar-category-label"/>
+                    <Button text="👤  Account Management" onAction="#navToAccounts" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="💳  Transaction Centre" onAction="#navToTransactions" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔁  Fund Transfers" onAction="#navToTransfers" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="📜  Transaction History" onAction="#navToHistory" maxWidth="Infinity" styleClass="nav-button"/>
 
-                <!-- User Profile Summary in Sidebar -->
-                <VBox styleClass="user-profile-card" spacing="4.0">
-                    <Text text="OPERATOR SESSION" style="-fx-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
-                    <Label fx:id="operatorNameLabel" text="Logged in as: Staff" style="-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                    <Label text="Role: Branch Officer" style="-fx-text-fill: #93c5fd; -fx-font-size: 11px;"/>
+                    <!-- Section: MANAGEMENT -->
+                    <Label text="MANAGEMENT" styleClass="sidebar-category-label"/>
+                    <Button text="📑  Reports &amp; Statements" onAction="#navToReports" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🔔  Notification Centre" onAction="#navToNotifications" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="🛡️  Security Overview" onAction="#navToSecurity" maxWidth="Infinity" styleClass="nav-button"/>
+
+                    <Region prefHeight="16.0"/>
+
+                    <!-- Authenticated Operator Card -->
+                    <VBox styleClass="user-profile-card" spacing="4.0">
+                        <Text text="AUTHENTICATED OPERATOR" style="-fx-fill: #94A3B8; -fx-font-size: 9.5px; -fx-font-weight: 800; -fx-letter-spacing: 0.6px;"/>
+                        <Label fx:id="operatorNameLabel" text="Priya Nair (Branch Officer)" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-font-size: 12.5px;"/>
+                        <Label text="Apex Main Branch • Level 3 Access" style="-fx-text-fill: #93C5FD; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <!-- Logout Button -->
+                    <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
                 </VBox>
-
-                <!-- Logout Button -->
-                <Button text="🚪  Log Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="nav-button-logout"/>
-            </VBox>
+            </ScrollPane>
         </VBox>
     </left>
 
@@ -50,29 +67,58 @@
     <center>
         <VBox>
             <!-- Top Header Bar -->
-            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="20.0">
+            <HBox styleClass="top-header" alignment="CENTER_LEFT" spacing="18.0">
                 <VBox spacing="2.0">
-                    <Text text="Operational Overview" styleClass="heading-lg"/>
-                    <Label fx:id="welcomeLabel" text="Welcome to the core banking terminal" styleClass="text-secondary"/>
+                    <Label fx:id="welcomeLabel" text="Good Morning, Administrator • Core Banking Operations" styleClass="heading-lg"/>
+                    <Label text="Apex Trust Bank Executive Operations &amp; Real-Time Clearing Ledger" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
                 </VBox>
+
                 <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Executive Header Controls -->
                 <HBox alignment="CENTER" spacing="12.0">
-                    <VBox alignment="CENTER_RIGHT">
-                        <Label fx:id="currentDateLabel" text="2026-10-30" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
-                        <Label text="System Status: Operational" style="-fx-font-size: 11px; -fx-text-fill: #10b981;"/>
-                    </VBox>
-                    <HBox alignment="CENTER" styleClass="demo-banner">
-                        <Label fx:id="demoBadgeLabel" text="⚡ DEMO DATA" styleClass="demo-badge-text"/>
+                    <!-- Global Search Field -->
+                    <HBox alignment="CENTER_LEFT" spacing="6.0" styleClass="header-search-box">
+                        <Label text="🔍" style="-fx-font-size: 12px;"/>
+                        <TextField fx:id="globalSearchField" promptText="Quick search account #..." 
+                                   onAction="#handleGlobalSearch" styleClass="header-search-field" prefWidth="180.0"/>
+                    </HBox>
+
+                    <!-- Date Chip -->
+                    <HBox alignment="CENTER" spacing="6.0" styleClass="date-chip">
+                        <Label text="📅" style="-fx-font-size: 12px;"/>
+                        <Label fx:id="currentDateLabel" text="12 Nov 2026" style="-fx-font-weight: bold; -fx-text-fill: #1E293B; -fx-font-size: 12px;"/>
+                    </HBox>
+
+                    <!-- Notification Button with Unread Badge -->
+                    <Button onAction="#navToNotifications" styleClass="header-icon-btn">
+                        <graphic>
+                            <HBox alignment="CENTER" spacing="4.0">
+                                <Label text="🔔" style="-fx-font-size: 13px;"/>
+                                <Label text="3" styleClass="notification-badge-unread"/>
+                            </HBox>
+                        </graphic>
+                    </Button>
+
+                    <!-- Profile Chip -->
+                    <HBox alignment="CENTER" spacing="8.0" styleClass="header-profile-box">
+                        <StackPane styleClass="avatar-badge">
+                            <Label text="PN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 10px; -fx-font-weight: 800;"/>
+                        </StackPane>
+                        <VBox spacing="1.0">
+                            <Label text="Priya Nair" style="-fx-font-size: 11.5px; -fx-font-weight: 700; -fx-text-fill: #1E293B;"/>
+                            <Label text="Admin • Level 3" style="-fx-font-size: 10px; -fx-text-fill: #16A34A; -fx-font-weight: bold;"/>
+                        </VBox>
                     </HBox>
                 </HBox>
             </HBox>
 
-            <!-- Scrollable Dashboard Content -->
-            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-                <VBox styleClass="content-area" spacing="24.0">
+            <!-- Scrollable Dashboard Content Area -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                <VBox styleClass="content-area" spacing="22.0">
 
-                    <!-- KPI Statistics Summary Grid -->
-                    <GridPane hgap="18.0" vgap="18.0">
+                    <!-- KPI Statistics Summary Grid (4 Cards) -->
+                    <GridPane hgap="16.0" vgap="16.0">
                         <columnConstraints>
                             <ColumnConstraints percentWidth="25.0"/>
                             <ColumnConstraints percentWidth="25.0"/>
@@ -80,83 +126,155 @@
                             <ColumnConstraints percentWidth="25.0"/>
                         </columnConstraints>
 
-                        <!-- KPI 1: Total Accounts -->
+                        <!-- KPI 1: Total Bank Balance -->
                         <VBox GridPane.columnIndex="0" styleClass="kpi-card" spacing="8.0">
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="👥" styleClass="kpi-icon-badge-blue" style="-fx-font-size: 16px;"/>
-                                <Label text="TOTAL ACCOUNTS" styleClass="kpi-title"/>
+                                <Label text="💰" styleClass="kpi-icon-badge-green" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="1.0">
+                                    <Label text="TOTAL BANK BALANCE" styleClass="kpi-title"/>
+                                    <Label text="Vault &amp; Depository Liquidity" styleClass="text-muted" style="-fx-font-size: 10.5px;"/>
+                                </VBox>
                             </HBox>
-                            <Label fx:id="kpiAccountsLabel" text="--" styleClass="kpi-value"/>
-                            <Label text="Active bank accounts registered" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                            <Label fx:id="kpiDepositsLabel" text="₹0.00" styleClass="kpi-value" style="-fx-text-fill: #16A34A;"/>
+                            <Label text="▲ +8.4% vs last month" styleClass="kpi-trend-positive"/>
                         </VBox>
 
-                        <!-- KPI 2: Total Balance / Vault -->
+                        <!-- KPI 2: Total Customer Accounts -->
                         <VBox GridPane.columnIndex="1" styleClass="kpi-card" spacing="8.0">
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="💰" styleClass="kpi-icon-badge-green" style="-fx-font-size: 16px;"/>
-                                <Label text="TOTAL DEPOSITS" styleClass="kpi-title"/>
+                                <Label text="👥" styleClass="kpi-icon-badge-blue" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="1.0">
+                                    <Label text="CUSTOMER ACCOUNTS" styleClass="kpi-title"/>
+                                    <Label text="Active Customer Portfolios" styleClass="text-muted" style="-fx-font-size: 10.5px;"/>
+                                </VBox>
                             </HBox>
-                            <Label fx:id="kpiDepositsLabel" text="0.00" styleClass="kpi-value" style="-fx-text-fill: #059669;"/>
-                            <Label text="Aggregated client liquidity" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                            <Label fx:id="kpiAccountsLabel" text="--" styleClass="kpi-value"/>
+                            <Label text="▲ +2 new registrations" styleClass="kpi-trend-positive"/>
                         </VBox>
 
                         <!-- KPI 3: Total Transactions -->
                         <VBox GridPane.columnIndex="2" styleClass="kpi-card" spacing="8.0">
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="📈" styleClass="kpi-icon-badge-purple" style="-fx-font-size: 16px;"/>
-                                <Label text="TOTAL TRANSACTIONS" styleClass="kpi-title"/>
+                                <Label text="📊" styleClass="kpi-icon-badge-purple" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="1.0">
+                                    <Label text="TOTAL TRANSACTIONS" styleClass="kpi-title"/>
+                                    <Label text="Cleared Operations Ledger" styleClass="text-muted" style="-fx-font-size: 10.5px;"/>
+                                </VBox>
                             </HBox>
                             <Label fx:id="kpiTransactionsLabel" text="--" styleClass="kpi-value"/>
-                            <Label text="Logged deposits, withdrawals &amp; transfers" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                            <Label text="▲ +15% weekly throughput" styleClass="kpi-trend-positive"/>
                         </VBox>
 
-                        <!-- KPI 4: Active Mode -->
+                        <!-- KPI 4: Active Accounts -->
                         <VBox GridPane.columnIndex="3" styleClass="kpi-card" spacing="8.0">
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="🛡️" styleClass="kpi-icon-badge-amber" style="-fx-font-size: 16px;"/>
-                                <Label text="DATA REPOSITORY" styleClass="kpi-title"/>
+                                <Label text="🛡️" styleClass="kpi-icon-badge-emerald" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="1.0">
+                                    <Label text="ACTIVE ACCOUNTS" styleClass="kpi-title"/>
+                                    <Label text="Verified Operational Health" styleClass="text-muted" style="-fx-font-size: 10.5px;"/>
+                                </VBox>
                             </HBox>
-                            <Label fx:id="kpiRepoModeLabel" text="In-Memory" styleClass="kpi-value" style="-fx-font-size: 20px;"/>
-                            <Label text="Ready for MySQL JDBC hookup" styleClass="text-muted" style="-fx-font-size: 11px;"/>
+                            <Label fx:id="kpiActiveAccountsLabel" text="--" styleClass="kpi-value" style="-fx-text-fill: #15803D;"/>
+                            <Label text="● 87.5% operational standing" styleClass="kpi-trend-positive"/>
                         </VBox>
                     </GridPane>
 
-                    <!-- Quick Actions Row -->
-                    <VBox styleClass="card" spacing="14.0">
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Text text="⚡ Quick Operations" styleClass="heading-md"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label text="Frequently used branch workflows" styleClass="text-muted" style="-fx-font-size: 12px;"/>
+                    <!-- Quick Banking Actions Card -->
+                    <VBox styleClass="card" spacing="12.0">
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                            <Label text="⚡" style="-fx-font-size: 16px;"/>
+                            <VBox spacing="1.0">
+                                <Text text="Core Banking Shortcuts" styleClass="heading-md"/>
+                                <Label text="Frequently used administrative workflows and teller commands" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
+                            </VBox>
                         </HBox>
-                        <HBox spacing="14.0">
-                            <Button text="➕ Open New Account" onAction="#navToAccounts" styleClass="btn-primary"/>
-                            <Button text="📥 Make a Deposit" onAction="#navToTransactions" styleClass="btn-secondary"/>
-                            <Button text="📤 Process Withdrawal" onAction="#navToTransactions" styleClass="btn-secondary"/>
-                            <Button text="🔁 Wire Transfer" onAction="#navToTransactions" styleClass="btn-secondary"/>
-                            <Button text="📑 Audit History" onAction="#navToHistory" styleClass="btn-secondary"/>
+                        <Separator/>
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
+                            <Button text="➕ Open New Account" onAction="#navToAccounts" styleClass="btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Button text="📥 Cash Deposit" onAction="#navToTransactions" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Button text="📤 Cash Withdrawal" onAction="#navToTransactions" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Button text="🔁 Fund Transfer" onAction="#navToTransfers" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Button text="📑 Reports &amp; Statements" onAction="#navToReports" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Button text="📜 Audit Ledger" onAction="#navToHistory" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
                         </HBox>
                     </VBox>
+
+                    <!-- Financial Analytics: Monthly Deposit and Withdrawal Comparison -->
+                    <VBox styleClass="card" spacing="10.0">
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                            <Label text="📊" style="-fx-font-size: 16px;"/>
+                            <VBox spacing="1.0">
+                                <Text text="Monthly Deposit vs Withdrawal Comparison" styleClass="heading-md"/>
+                                <Label text="Side-by-side transaction volume comparison across months (in ₹)" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                            </VBox>
+                        </HBox>
+                        <Separator/>
+                        <BarChart fx:id="monthlyTxChart" animated="false" legendVisible="true" prefHeight="260.0" minHeight="240.0">
+                            <xAxis>
+                                <CategoryAxis fx:id="monthlyChartXAxis" label="Month"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="monthlyChartYAxis" label="Amount (₹)"/>
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+
+                    <!-- Financial Analytics Row 2: Account Type Distribution & Account Status Distribution -->
+                    <GridPane hgap="18.0" vgap="18.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- Chart 3: Account Type Distribution (PieChart) -->
+                        <VBox GridPane.columnIndex="0" styleClass="card" spacing="10.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="🏷️" style="-fx-font-size: 16px;"/>
+                                <VBox spacing="1.0">
+                                    <Text text="Account Type Distribution" styleClass="heading-md"/>
+                                    <Label text="Breakdown of customer portfolios between Savings and Current" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+                            <PieChart fx:id="accountTypePieChart" animated="false" legendVisible="true" prefHeight="210.0" minHeight="200.0"/>
+                        </VBox>
+
+                        <!-- Chart 4: Account Status Distribution (PieChart) -->
+                        <VBox GridPane.columnIndex="1" styleClass="card" spacing="10.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label text="🛡️" style="-fx-font-size: 16px;"/>
+                                <VBox spacing="1.0">
+                                    <Text text="Account Status Distribution" styleClass="heading-md"/>
+                                    <Label text="Health overview: Active vs Inactive portfolios" styleClass="text-secondary" style="-fx-font-size: 11px;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator/>
+                            <PieChart fx:id="accountStatusPieChart" animated="false" legendVisible="true" prefHeight="210.0" minHeight="200.0"/>
+                        </VBox>
+                    </GridPane>
 
                     <!-- Recent Transactions Table Preview -->
                     <VBox styleClass="card" spacing="14.0">
                         <HBox alignment="CENTER_LEFT">
                             <VBox spacing="2.0">
-                                <Text text="Recent Ledger Activity" styleClass="heading-md"/>
-                                <Label text="Real-time audit log of the most recent transactions" styleClass="text-secondary" style="-fx-font-size: 12px;"/>
+                                <Text text="Recent Ledger Operations" styleClass="heading-md"/>
+                                <Label text="Real-time audit log of the most recent cleared financial transactions" styleClass="text-secondary" style="-fx-font-size: 11.5px;"/>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Button text="View All History →" onAction="#navToHistory" styleClass="btn-secondary" style="-fx-font-size: 12px; -fx-padding: 6px 12px;"/>
+                            <Button text="View All History Ledger →" onAction="#navToHistory" styleClass="btn-secondary" style="-fx-font-size: 12px; -fx-padding: 6px 14px;"/>
                         </HBox>
 
-                        <TableView fx:id="recentTransactionsTable" prefHeight="220.0">
+                        <TableView fx:id="recentTransactionsTable" prefHeight="240.0">
                             <columns>
                                 <TableColumn fx:id="colId" text="TX ID" prefWidth="90.0"/>
+                                <TableColumn fx:id="colDate" text="Date &amp; Time" prefWidth="155.0"/>
+                                <TableColumn fx:id="colCustomer" text="Customer Name" prefWidth="150.0"/>
+                                <TableColumn fx:id="colSource" text="Account #" prefWidth="110.0"/>
+                                <TableColumn fx:id="colDest" text="Destination" prefWidth="130.0"/>
                                 <TableColumn fx:id="colType" text="Type" prefWidth="120.0"/>
-                                <TableColumn fx:id="colSource" text="Source Account" prefWidth="140.0"/>
-                                <TableColumn fx:id="colDest" text="Destination Account" prefWidth="160.0"/>
-                                <TableColumn fx:id="colAmount" text="Amount" prefWidth="130.0"/>
-                                <TableColumn fx:id="colDescription" text="Description / Remark" prefWidth="200.0"/>
-                                <TableColumn fx:id="colDate" text="Date &amp; Time" prefWidth="170.0"/>
+                                <TableColumn fx:id="colAmount" text="Amount" prefWidth="135.0"/>
+                                <TableColumn fx:id="colStatus" text="Status" prefWidth="105.0"/>
+                                <TableColumn fx:id="colDescription" text="Remarks" prefWidth="200.0"/>
                             </columns>
                             <placeholder>
                                 <Label text="No transaction records currently registered."/>

@@ -2,10 +2,12 @@ package com.bank.controller;
 
 import com.bank.Main;
 import com.bank.model.Account;
+import com.bank.model.Transaction;
 import com.bank.service.AccountService;
 import com.bank.service.AuthenticationService;
 import com.bank.service.BankingException;
 import com.bank.service.ServiceFactory;
+import com.bank.service.TransactionService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,22 +20,24 @@ import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Controller for Account Management.
- * Manages customer onboarding, account querying, and directory listing.
- * Prepared for Pranita's AccountService implementation.
+ * Controller for Account Administration & Customer Management Centre.
+ * Manages customer onboarding, account querying, directory listing, and customer 360 profile.
  * 
- * Author: Keerthana (Frontend Lead)
+ * Redesigned for Apex Trust Bank Enterprise Architecture.
  */
 public class AccountController implements Initializable {
 
     // Sidebar & Header
     @FXML private Label operatorNameLabel;
     @FXML private Label demoBadgeLabel;
+    @FXML private Label currentDateLabel;
     @FXML private Label statusMessageLabel;
 
     // Create Account Form
@@ -60,6 +64,13 @@ public class AccountController implements Initializable {
     @FXML private Label detailPhoneLabel;
     @FXML private Label detailCreatedLabel;
 
+    // Selected Customer Mini-Transactions Table
+    @FXML private TableView<Transaction> customerTransactionsTable;
+    @FXML private TableColumn<Transaction, String> custTxId;
+    @FXML private TableColumn<Transaction, String> custTxType;
+    @FXML private TableColumn<Transaction, String> custTxAmount;
+    @FXML private TableColumn<Transaction, String> custTxDate;
+
     // Directory TableView
     @FXML private TextField tableFilterField;
     @FXML private TableView<Account> accountsTable;
@@ -73,6 +84,7 @@ public class AccountController implements Initializable {
     @FXML private TableColumn<Account, String> colCreated;
 
     private AccountService accountService;
+    private TransactionService transactionService;
     private AuthenticationService authService;
     private ObservableList<Account> accountsMasterList = FXCollections.observableArrayList();
     private FilteredList<Account> filteredAccounts;
@@ -80,11 +92,20 @@ public class AccountController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.accountService = ServiceFactory.getInstance().getAccountService();
+        this.transactionService = ServiceFactory.getInstance().getTransactionService();
         this.authService = ServiceFactory.getInstance().getAuthenticationService();
 
         // Header & User
-        operatorNameLabel.setText(authService.getCurrentUser());
-        demoBadgeLabel.setText(ServiceFactory.getInstance().isDemoMode() ? "⚡ DEMO / PRANITA READY" : "🔒 LIVE MYSQL");
+        String currentUser = authService != null ? authService.getCurrentUser() : "Priya Nair (Branch Officer)";
+        if (operatorNameLabel != null) {
+            operatorNameLabel.setText(currentUser);
+        }
+        if (demoBadgeLabel != null) {
+            demoBadgeLabel.setText(ServiceFactory.getInstance().isDemoMode() ? "⚡ In-Memory Demo" : "🔒 Live MySQL");
+        }
+        if (currentDateLabel != null) {
+            currentDateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+        }
 
         // Init ComboBox
         accountTypeCombo.setItems(FXCollections.observableArrayList("SAVINGS", "CURRENT"));
@@ -92,11 +113,12 @@ public class AccountController implements Initializable {
 
         // Configure Table Columns
         setupTableColumns();
+        setupCustomerTxTable();
 
         // Load Accounts
         loadAccountsData();
 
-        // Table Selection Listener -> updates Inspector Card
+        // Table Selection Listener -> updates Inspector Card & Customer History
         accountsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 displayAccountDetails(newVal);
@@ -111,7 +133,8 @@ public class AccountController implements Initializable {
                 String lower = newValue.toLowerCase().trim();
                 return account.getAccountNumber().toLowerCase().contains(lower)
                         || account.getCustomerName().toLowerCase().contains(lower)
-                        || account.getEmail().toLowerCase().contains(lower);
+                        || account.getEmail().toLowerCase().contains(lower)
+                        || (account.getPhone() != null && account.getPhone().contains(lower));
             });
         });
         accountsTable.setItems(filteredAccounts);
@@ -126,6 +149,80 @@ public class AccountController implements Initializable {
         colEmail.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
         colPhone.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhone()));
         colCreated.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFormattedDate()));
+
+        // Status badge in table
+        colStatus.setCellFactory(col -> new TableCell<Account, String>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label badge = new Label(status.toUpperCase());
+                    if ("ACTIVE".equalsIgnoreCase(status)) {
+                        badge.getStyleClass().add("badge-active");
+                    } else {
+                        badge.getStyleClass().add("badge-inactive");
+                    }
+                    setGraphic(badge);
+                    setText(null);
+                }
+            }
+        });
+
+        // Balance styling in table
+        colBalance.setCellFactory(col -> new TableCell<Account, String>() {
+            @Override
+            protected void updateItem(String balanceStr, boolean empty) {
+                super.updateItem(balanceStr, empty);
+                if (empty || balanceStr == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(balanceStr);
+                    setStyle("-fx-text-fill: #16A34A; -fx-font-weight: bold;");
+                }
+            }
+        });
+    }
+
+    private void setupCustomerTxTable() {
+        if (customerTransactionsTable == null) return;
+
+        if (custTxId != null) {
+            custTxId.setCellValueFactory(cellData -> new SimpleStringProperty("#" + cellData.getValue().getTransactionId()));
+        }
+        if (custTxType != null) {
+            custTxType.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTransactionType()));
+            custTxType.setCellFactory(col -> new TableCell<Transaction, String>() {
+                @Override
+                protected void updateItem(String type, boolean empty) {
+                    super.updateItem(type, empty);
+                    if (empty || type == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        Label badge = new Label(type);
+                        if ("DEPOSIT".equalsIgnoreCase(type)) {
+                            badge.getStyleClass().add("badge-deposit");
+                        } else if ("WITHDRAWAL".equalsIgnoreCase(type)) {
+                            badge.getStyleClass().add("badge-withdrawal");
+                        } else {
+                            badge.getStyleClass().add("badge-transfer");
+                        }
+                        setGraphic(badge);
+                        setText(null);
+                    }
+                }
+            });
+        }
+        if (custTxAmount != null) {
+            custTxAmount.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFormattedAmount()));
+        }
+        if (custTxDate != null) {
+            custTxDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFormattedDate()));
+        }
     }
 
     private void loadAccountsData() {
@@ -134,7 +231,7 @@ public class AccountController implements Initializable {
             accountsMasterList.setAll(all);
 
             // Display first account details as default if available
-            if (!all.isEmpty() && detailAccNumberLabel.getText().equals("ACC-1001")) {
+            if (!all.isEmpty() && (detailAccNumberLabel.getText() == null || detailAccNumberLabel.getText().equals("ACC-1001") || detailAccNumberLabel.getText().isBlank())) {
                 displayAccountDetails(all.get(0));
             }
         } catch (BankingException e) {
@@ -162,7 +259,7 @@ public class AccountController implements Initializable {
         }
 
         if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            showError("Please provide a valid email address (e.g., name@domain.com).");
+            showError("Please provide a valid email address (e.g., name@apexbank.in).");
             emailField.requestFocus();
             return;
         }
@@ -192,12 +289,12 @@ public class AccountController implements Initializable {
                 }
             }
         } catch (NumberFormatException e) {
-            showError("Invalid monetary amount. Please enter a valid decimal number (e.g., 500.00).");
+            showError("Invalid monetary amount. Please enter a valid decimal number (e.g., 5000.00).");
             initialDepositField.requestFocus();
             return;
         }
 
-        // 3. Delegate to Pranita's AccountService
+        // 3. Delegate to AccountService
         try {
             Account created = accountService.createAccount(name, email, phone, type, initialDeposit);
             
@@ -241,7 +338,6 @@ public class AccountController implements Initializable {
                 Account account = result.get();
                 displayAccountDetails(account);
                 showSuccess("Account found: " + account.getAccountNumber() + " (" + account.getCustomerName() + ")");
-                // Select in table if present
                 accountsTable.getSelectionModel().select(account);
             } else {
                 showError("No account found matching '" + query.trim() + "'.");
@@ -261,10 +357,22 @@ public class AccountController implements Initializable {
         detailPhoneLabel.setText(account.getPhone());
         detailCreatedLabel.setText(account.getFormattedDate());
 
+        detailStatusBadge.getStyleClass().clear();
         if ("ACTIVE".equalsIgnoreCase(account.getStatus())) {
-            detailStatusBadge.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-font-weight: bold; -fx-padding: 4px 10px; -fx-background-radius: 20px;");
+            detailStatusBadge.getStyleClass().add("badge-active");
         } else {
-            detailStatusBadge.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-padding: 4px 10px; -fx-background-radius: 20px;");
+            detailStatusBadge.getStyleClass().add("badge-inactive");
+        }
+
+        // Load customer recent transaction activity
+        if (customerTransactionsTable != null && transactionService != null) {
+            try {
+                List<Transaction> custTxs = transactionService.getTransactionHistory(account.getAccountNumber());
+                List<Transaction> recentCustTxs = custTxs.subList(0, Math.min(5, custTxs.size()));
+                customerTransactionsTable.setItems(FXCollections.observableArrayList(recentCustTxs));
+            } catch (BankingException e) {
+                System.err.println("[AccountController] Could not load customer history: " + e.getMessage());
+            }
         }
     }
 
@@ -310,6 +418,10 @@ public class AccountController implements Initializable {
     @FXML public void navToDashboard(ActionEvent e) { Main.navigateTo("dashboard.fxml", "Apex Trust Bank - Operational Dashboard"); }
     @FXML public void navToAccounts(ActionEvent e) { loadAccountsData(); }
     @FXML public void navToTransactions(ActionEvent e) { Main.navigateTo("transaction.fxml", "Apex Trust Bank - Process Transactions"); }
+    @FXML public void navToTransfers(ActionEvent e) { Main.navigateTo("transfer.fxml", "Apex Trust Bank - Fund Transfers & Beneficiaries"); }
     @FXML public void navToHistory(ActionEvent e) { Main.navigateTo("history.fxml", "Apex Trust Bank - Transaction Audit History"); }
+    @FXML public void navToReports(ActionEvent e) { Main.navigateTo("reports.fxml", "Apex Trust Bank - Reports & Statements"); }
+    @FXML public void navToNotifications(ActionEvent e) { Main.navigateTo("notifications.fxml", "Apex Trust Bank - Notification Centre"); }
+    @FXML public void navToSecurity(ActionEvent e) { Main.navigateTo("security.fxml", "Apex Trust Bank - Security Overview"); }
     @FXML public void handleLogout(ActionEvent e) { authService.logout(); Main.navigateTo("login.fxml", "Apex Trust Bank - Secure Staff Login"); }
 }
