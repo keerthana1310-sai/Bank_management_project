@@ -131,6 +131,35 @@ public class AccountDAO {
         }
     }
 
+    
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM accounts";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+
+    public BigDecimal sumAllBalances() throws SQLException {
+        String sql = "SELECT COALESCE(SUM(balance), 0) FROM accounts";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getBigDecimal(1);
+            }
+            return BigDecimal.ZERO;
+        }
+    }
+
     private Account mapResultSetToAccount(ResultSet rs) throws SQLException {
         Account a = new Account();
         a.setAccountNumber(rs.getString("account_number"));
