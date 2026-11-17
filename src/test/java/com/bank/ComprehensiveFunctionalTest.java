@@ -1,3 +1,4 @@
+
 package com.bank;
 
 import com.bank.controller.*;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -35,40 +37,62 @@ public class ComprehensiveFunctionalTest {
         } catch (IllegalStateException alreadyStarted) {
             latch.countDown();
         }
-        assertTrue(latch.await(5, TimeUnit.SECONDS), "JavaFX failed to initialize");
+        assertTrue(latch.await(5, TimeUnit.SECONDS),
+                "JavaFX failed to initialize");
     }
 
     @Test
     @DisplayName("Verify AccountService CRUD and Indian Customer Seed Data")
     public void testAccountServiceOperations() throws Exception {
-        AccountService accountService = ServiceFactory.getInstance().getAccountService();
+        AccountService accountService =
+                ServiceFactory.getInstance().getAccountService();
+
         assertNotNull(accountService);
 
         // 1. Verify seed accounts
         List<Account> accounts = accountService.getAllAccounts();
-        assertTrue(accounts.size() >= 8, "Expected at least 8 seeded accounts");
+        assertTrue(accounts.size() >= 8,
+                "Expected at least 8 seeded accounts");
 
-        Optional<Account> acc1 = accountService.findAccount("ACC-1001");
+        Optional<Account> acc1 =
+                accountService.findAccount("ACC-1001");
+
         assertTrue(acc1.isPresent());
-        assertEquals("Aarav Sharma", acc1.get().getCustomerName());
-        assertEquals("SAVINGS", acc1.get().getAccountType());
+        assertEquals("Aarav Sharma",
+                acc1.get().getCustomerName());
+        assertEquals("SAVINGS",
+                acc1.get().getAccountType());
         assertTrue(acc1.get().getFormattedBalance().startsWith("₹"));
 
-        // 2. Test Create Account
+        // 2. Test Create Account using unique customer details
+        String uniqueId = UUID.randomUUID().toString();
+
+        String uniqueEmail =
+                "sneha.test." + uniqueId + "@apexbank.in";
+
+        String uniquePhone =
+                "9" + String.format("%09d",
+                Math.floorMod(UUID.randomUUID().hashCode(),
+                        1_000_000_000));
+
         Account newAcc = accountService.createAccount(
                 "Sneha Rao Test",
-                "sneha.test@apexbank.in",
-                "9876543299",
+                uniqueEmail,
+                uniquePhone,
                 "SAVINGS",
                 new BigDecimal("15000.00")
         );
+
         assertNotNull(newAcc);
         assertNotNull(newAcc.getAccountNumber());
-        assertEquals("Sneha Rao Test", newAcc.getCustomerName());
+        assertEquals("Sneha Rao Test",
+                newAcc.getCustomerName());
         assertTrue(newAcc.getFormattedBalance().contains("15,000"));
 
         // 3. Find newly created account
-        Optional<Account> found = accountService.findAccount(newAcc.getAccountNumber());
+        Optional<Account> found =
+                accountService.findAccount(newAcc.getAccountNumber());
+
         assertTrue(found.isPresent());
         assertEquals("ACTIVE", found.get().getStatus());
     }
@@ -76,42 +100,78 @@ public class ComprehensiveFunctionalTest {
     @Test
     @DisplayName("Verify TransactionService Deposit, Withdrawal, and Transfer Operations")
     public void testTransactionServiceOperations() throws Exception {
-        AccountService accountService = ServiceFactory.getInstance().getAccountService();
-        TransactionService txService = ServiceFactory.getInstance().getTransactionService();
+        AccountService accountService =
+                ServiceFactory.getInstance().getAccountService();
+
+        TransactionService txService =
+                ServiceFactory.getInstance().getTransactionService();
 
         // 1. Initial balance check
-        Account acc1 = accountService.findAccount("ACC-1001").orElseThrow();
+        Account acc1 =
+                accountService.findAccount("ACC-1001").orElseThrow();
+
         BigDecimal initialBal = acc1.getBalance();
 
         // 2. Deposit Test
         BigDecimal depositAmount = new BigDecimal("5000.00");
-        Transaction depositTx = txService.deposit("ACC-1001", depositAmount, "Automated Test Deposit");
+
+        Transaction depositTx = txService.deposit(
+                "ACC-1001",
+                depositAmount,
+                "Automated Test Deposit"
+        );
+
         assertNotNull(depositTx);
         assertEquals("DEPOSIT", depositTx.getTransactionType());
-        assertEquals(initialBal.add(depositAmount), depositTx.getBalanceAfter());
+        assertEquals(initialBal.add(depositAmount),
+                depositTx.getBalanceAfter());
         assertTrue(depositTx.getFormattedAmount().startsWith("₹"));
 
         // 3. Withdrawal Test
         BigDecimal withdrawAmount = new BigDecimal("2000.00");
-        Transaction withdrawTx = txService.withdraw("ACC-1001", withdrawAmount, "Automated Test Withdrawal");
+
+        Transaction withdrawTx = txService.withdraw(
+                "ACC-1001",
+                withdrawAmount,
+                "Automated Test Withdrawal"
+        );
+
         assertNotNull(withdrawTx);
-        assertEquals("WITHDRAWAL", withdrawTx.getTransactionType());
-        assertEquals(depositTx.getBalanceAfter().subtract(withdrawAmount), withdrawTx.getBalanceAfter());
+        assertEquals("WITHDRAWAL",
+                withdrawTx.getTransactionType());
+        assertEquals(
+                depositTx.getBalanceAfter().subtract(withdrawAmount),
+                withdrawTx.getBalanceAfter()
+        );
 
         // 4. Transfer Test
-        Account acc2 = accountService.findAccount("ACC-1002").orElseThrow();
+        Account acc2 =
+                accountService.findAccount("ACC-1002").orElseThrow();
+
         BigDecimal acc2Initial = acc2.getBalance();
 
         BigDecimal transferAmount = new BigDecimal("1500.00");
-        Transaction transferTx = txService.transfer("ACC-1001", "ACC-1002", transferAmount, "Automated Test Transfer");
+
+        Transaction transferTx = txService.transfer(
+                "ACC-1001",
+                "ACC-1002",
+                transferAmount,
+                "Automated Test Transfer"
+        );
+
         assertNotNull(transferTx);
         assertEquals("TRANSFER", transferTx.getTransactionType());
         assertEquals("ACC-1001", transferTx.getSourceAccount());
         assertEquals("ACC-1002", transferTx.getDestinationAccount());
 
         // Verify destination balance updated
-        Account acc2After = accountService.findAccount("ACC-1002").orElseThrow();
-        assertEquals(acc2Initial.add(transferAmount), acc2After.getBalance());
+        Account acc2After =
+                accountService.findAccount("ACC-1002").orElseThrow();
+
+        assertEquals(
+                acc2Initial.add(transferAmount),
+                acc2After.getBalance()
+        );
     }
 
     @Test
@@ -121,12 +181,15 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/dashboard.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 DashboardController controller = loader.getController();
                 assertNotNull(controller);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -140,12 +203,15 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/account.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 AccountController controller = loader.getController();
                 assertNotNull(controller);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -159,12 +225,15 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/transaction.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 TransactionController controller = loader.getController();
                 assertNotNull(controller);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -178,12 +247,15 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/history.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 HistoryController controller = loader.getController();
                 assertNotNull(controller);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -197,12 +269,15 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/login.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 LoginController controller = loader.getController();
                 assertNotNull(controller);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -216,39 +291,51 @@ public class ComprehensiveFunctionalTest {
             try {
                 // 1. Test Account Controller Form Interactions
                 URL accRes = getClass().getResource("/com/bank/account.fxml");
+
                 FXMLLoader accLoader = new FXMLLoader(accRes);
                 accLoader.load();
+
                 AccountController accCtrl = accLoader.getController();
                 assertNotNull(accCtrl);
+
                 accCtrl.handleRefreshTable(null);
                 accCtrl.handleResetForm(null);
 
                 // 2. Test Transaction Controller Event Interactions
                 URL txRes = getClass().getResource("/com/bank/transaction.fxml");
+
                 FXMLLoader txLoader = new FXMLLoader(txRes);
                 txLoader.load();
+
                 TransactionController txCtrl = txLoader.getController();
                 assertNotNull(txCtrl);
+
                 txCtrl.handleTypeChanged(null);
                 txCtrl.handleCheckSourceAccount(null);
                 txCtrl.handleClearForm(null);
 
                 // 3. Test History Controller Filtering
                 URL histRes = getClass().getResource("/com/bank/history.fxml");
+
                 FXMLLoader histLoader = new FXMLLoader(histRes);
                 histLoader.load();
+
                 HistoryController histCtrl = histLoader.getController();
                 assertNotNull(histCtrl);
+
                 histCtrl.handleApplyFilter(null);
                 histCtrl.handleClearFilter(null);
                 histCtrl.handleRefresh(null);
 
                 // 4. Test Dashboard Controller Refresh
                 URL dashRes = getClass().getResource("/com/bank/dashboard.fxml");
+
                 FXMLLoader dashLoader = new FXMLLoader(dashRes);
                 dashLoader.load();
+
                 DashboardController dashCtrl = dashLoader.getController();
                 assertNotNull(dashCtrl);
+
                 dashCtrl.navToDashboard(null);
 
             } catch (Exception e) {
@@ -264,14 +351,18 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/transfer.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 TransferController controller = loader.getController();
                 assertNotNull(controller);
+
                 controller.selectBenAnanya(null);
                 controller.handleReset(null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -285,14 +376,18 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/notifications.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 NotificationController controller = loader.getController();
                 assertNotNull(controller);
+
                 controller.handleFilterCategory(null);
                 controller.handleMarkAllAsRead(null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -306,13 +401,17 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/reports.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 ReportsController controller = loader.getController();
                 assertNotNull(controller);
+
                 controller.handleGenerateReport(null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -326,14 +425,18 @@ public class ComprehensiveFunctionalTest {
             try {
                 URL res = getClass().getResource("/com/bank/security.fxml");
                 assertNotNull(res);
+
                 FXMLLoader loader = new FXMLLoader(res);
                 Parent root = loader.load();
+
                 assertNotNull(root);
 
                 SecurityController controller = loader.getController();
                 assertNotNull(controller);
+
                 controller.handleRunIntegrityAudit(null);
                 controller.handleExportAuditLog(null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -354,9 +457,14 @@ public class ComprehensiveFunctionalTest {
             }
         });
 
-        assertTrue(latch.await(6, TimeUnit.SECONDS), "Operation on FX thread timed out");
+        assertTrue(latch.await(6, TimeUnit.SECONDS),
+                "Operation on FX thread timed out");
+
         if (error[0] != null) {
-            throw new AssertionError("FX Thread execution failed", error[0]);
+            throw new AssertionError(
+                    "FX Thread execution failed",
+                    error[0]
+            );
         }
     }
 }

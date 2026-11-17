@@ -1,77 +1,63 @@
 package com.bank.dao;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Manages JDBC Database Connections for the Bank Management System.
- * Assigned to: Yashaswi
- * 
- * SECURITY NOTICE:
- * Database credentials must NOT be hardcoded in production.
- * This class reads credentials from environment variables (or .env configuration).
- */
-public class DatabaseConnection {
+/** Central JDBC connection configuration. Environment variables and JVM properties
+ * override values in an optional project-root .env file. */
+public final class DatabaseConnection {
+    private static final Map<String, String> DOTENV = loadDotEnv();
+    private DatabaseConnection() { }
 
-    // Default configuration (can be overridden via environment variables)
-    private static final String DEFAULT_HOST = "localhost";
-    private static final String DEFAULT_PORT = "3306";
-    private static final String DEFAULT_DB   = "bank_db";
-    private static final String DEFAULT_USER = "root";
-    private static final String DEFAULT_PASS = "";
+    private static Map<String, String> loadDotEnv() {
+        Map<String, String> values = new HashMap<>();
+        Path file = Path.of(".env");
+        if (!Files.isRegularFile(file)) return values;
+        try {
+            for (String line : Files.readAllLines(file)) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty() || trimmed.startsWith("#") || !trimmed.contains("=")) continue;
+                int split = trimmed.indexOf('=');
+                String key = trimmed.substring(0, split).trim();
+                String value = trimmed.substring(split + 1).trim();
+                if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'")))
+                    value = value.substring(1, value.length() - 1);
+                if (!key.isEmpty()) values.put(key, value);
+            }
+        } catch (IOException e) {
+            System.err.println("[DatabaseConnection] Could not read .env: " + e.getMessage());
+        }
+        return values;
+    }
 
-    private static String getEnvOrDefault(String key, String defaultValue) {
-        String val = System.getenv(key);
-        return (val != null && !val.isBlank()) ? val.trim() : defaultValue;
+    public static String getSetting(String key, String fallback) {
+        String value = System.getProperty(key);
+        if (value == null || value.isBlank()) value = System.getenv(key);
+        if (value == null || value.isBlank()) value = DOTENV.get(key);
+        return value == null || value.isBlank() ? fallback : value.trim();
     }
 
     public static String getJdbcUrl() {
-        String host = getEnvOrDefault("DB_HOST", DEFAULT_HOST);
-        String port = getEnvOrDefault("DB_PORT", DEFAULT_PORT);
-        String db   = getEnvOrDefault("DB_NAME", DEFAULT_DB);
-        // Uses standard MySQL 8.x connection parameters with SSL disabled for local dev
         return String.format("jdbc:mysql://%s:%s/%s?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
-                host, port, db);
+                getSetting("DB_HOST", "localhost"), getSetting("DB_PORT", "3306"), getSetting("DB_NAME", "bank_db"));
     }
+    public static String getDbUser() { return getSetting("DB_USER", "root"); }
+    public static String getDbPassword() { return getSetting("DB_PASSWORD", ""); }
 
-    public static String getDbUser() {
-        return getEnvOrDefault("DB_USER", DEFAULT_USER);
-    }
-
-    public static String getDbPassword() {
-        return getEnvOrDefault("DB_PASSWORD", DEFAULT_PASS);
-    }
-
-    /**
-     * Establishes and returns a new JDBC Connection.
-     * Yashaswi: Remember to close connections or use try-with-resources in DAOs!
-     *
-     * @return Active Connection object
-     * @throws SQLException if connection fails
-     */
     public static Connection getConnection() throws SQLException {
-        try {
-            // Load MySQL Connector/J driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("MySQL JDBC Driver not found. Ensure mysql-connector-j is in pom.xml.", e);
-        }
-
+        try { Class.forName("com.mysql.cj.jdbc.Driver"); }
+        catch (ClassNotFoundException e) { throw new SQLException("MySQL JDBC Driver not found. Check pom.xml dependencies.", e); }
         return DriverManager.getConnection(getJdbcUrl(), getDbUser(), getDbPassword());
     }
 
-    /**
-     * Utility method to quickly test connectivity to the MySQL database.
-     *
-     * @return true if connection succeeds, false otherwise
-     */
     public static boolean testConnection() {
-        try (Connection conn = getConnection()) {
-            return conn != null && !conn.isClosed();
-        } catch (SQLException e) {
-            System.err.println("[DatabaseConnection] Connection test failed: " + e.getMessage());
-            return false;
-        }
+        try (Connection connection = getConnection()) { return connection != null && !connection.isClosed(); }
+        catch (SQLException e) { System.err.println("[DatabaseConnection] Connection test failed: " + e.getMessage()); return false; }
     }
 }

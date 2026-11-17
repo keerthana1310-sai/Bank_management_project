@@ -1,5 +1,10 @@
 package com.bank.service;
 
+import com.bank.service.impl.JdbcAccountService;
+import com.bank.service.impl.JdbcTransactionService;
+import com.bank.service.impl.JdbcAuthenticationService;
+import com.bank.dao.DatabaseConnection;
+
 /**
  * ServiceFactory manages instantiation and dependency injection of services.
  * 
@@ -20,47 +25,22 @@ public class ServiceFactory {
 
     private ServiceFactory() {
         // Read configuration (defaults to true for standalone demonstration)
-        String envDemo = System.getenv("DEMO_MODE");
-        String propDemo = System.getProperty("demo.mode");
-        
-        if (envDemo != null) {
-            this.demoMode = Boolean.parseBoolean(envDemo.trim());
-        } else if (propDemo != null) {
-            this.demoMode = Boolean.parseBoolean(propDemo.trim());
-        } else {
-            // Default to demo mode so the frontend always works out-of-the-box!
-            this.demoMode = true;
+        String configuredMode = System.getProperty("demo.mode");
+        if (configuredMode == null || configuredMode.isBlank()) {
+            configuredMode = DatabaseConnection.getSetting("DEMO_MODE", "true");
         }
+        this.demoMode = Boolean.parseBoolean(configuredMode.trim());
 
         if (demoMode) {
             this.accountService = new DemoAccountService();
             this.transactionService = new DemoTransactionService(this.accountService);
             this.authenticationService = new DemoAuthenticationService();
         } else {
-            // Live MySQL JDBC services (to be hooked up with Yashaswi's DAOs)
-            // If MySQL fails to connect, fallback to Demo mode with warning
-            AccountService accSvc;
-            TransactionService txSvc;
-            AuthenticationService authSvc;
-
-            try {
-                // Future integration point:
-                // accSvc = new JdbcAccountService(new AccountDAOImpl(), new CustomerDAOImpl());
-                // txSvc = new JdbcTransactionService(new TransactionDAOImpl(), new AccountDAOImpl());
-                // authSvc = new JdbcAuthenticationService();
-                accSvc = new DemoAccountService();
-                txSvc = new DemoTransactionService(accSvc);
-                authSvc = new DemoAuthenticationService();
-            } catch (Exception e) {
-                System.err.println("[ServiceFactory] Failed to initialize JDBC services. Falling back to Demo Mode: " + e.getMessage());
-                accSvc = new DemoAccountService();
-                txSvc = new DemoTransactionService(accSvc);
-                authSvc = new DemoAuthenticationService();
-            }
-
-            this.accountService = accSvc;
-            this.transactionService = txSvc;
-            this.authenticationService = authSvc;
+            // Live mode must use JDBC. If the database is unavailable, fail visibly instead of
+            // silently presenting in-memory data as if it were persisted.
+            this.accountService = new JdbcAccountService();
+            this.transactionService = new JdbcTransactionService();
+            this.authenticationService = new JdbcAuthenticationService();
         }
     }
 
