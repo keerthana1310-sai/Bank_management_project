@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 -- -------------------------------------------------------------------
 -- 4. Table: users
 -- Stores staff/teller authentication credentials.
--- NOTE: In production, password_hash should store BCrypt or Argon2 hashes.
+-- Passwords are stored using PBKDF2WithHmacSHA256 hashing.
 -- -------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,7 +115,9 @@ INSERT IGNORE INTO transactions (transaction_id, transaction_type, source_accoun
 (5010, 'WITHDRAWAL', 'ACC-1004', NULL, 8000.00, 115400.75, 'Utility & Merchant Payment', '2026-11-06 13:10:00'),
 (5011, 'DEPOSIT', 'ACC-1001', NULL, 15000.00, 85500.00, 'Cheque Clearance Deposit', '2026-11-09 10:15:00');
 
-INSERT IGNORE INTO users (username, password_hash, full_name, role) VALUES
-('admin', 'admin123', 'System Administrator', 'ADMIN'),
-('priya', 'bank2026', 'Priya Nair (Branch Officer)', 'TELLER'),
-('teller', 'teller123', 'Front Desk Teller', 'TELLER');
+-- Staff users are intentionally NOT seeded with plaintext passwords.
+-- Generate a PBKDF2 hash with PasswordHashGenerator, then insert it, for example:
+-- INSERT INTO users (username, password_hash, full_name, role)
+-- VALUES ('admin', '<paste-generated-hash-here>', 'System Administrator', 'ADMIN');
+-- Never store plaintext passwords in password_hash.
+

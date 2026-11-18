@@ -14,24 +14,26 @@ import java.util.Optional;
 public class CustomerDAO {
 
     public Long save(Customer customer) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return save(customer, conn);
+        }
+    }
+
+    /** Inserts using a caller-managed connection, allowing a larger operation to be atomic. */
+    public Long save(Customer customer, Connection conn) throws SQLException {
         String sql = "INSERT INTO customers (name, email, phone, address, created_at) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, customer.getName());
             stmt.setString(2, customer.getEmail());
             stmt.setString(3, customer.getPhone());
             stmt.setString(4, customer.getAddress());
             stmt.setTimestamp(5, Timestamp.valueOf(customer.getCreatedAt()));
-
-            int rows = stmt.executeUpdate();
-            if (rows > 0) {
+            if (stmt.executeUpdate() > 0) {
                 try (ResultSet keys = stmt.getGeneratedKeys()) {
                     if (keys.next()) {
-                        long generatedId = keys.getLong(1);
-                        customer.setCustomerId(generatedId);
-                        return generatedId;
+                        long id = keys.getLong(1);
+                        customer.setCustomerId(id);
+                        return id;
                     }
                 }
             }

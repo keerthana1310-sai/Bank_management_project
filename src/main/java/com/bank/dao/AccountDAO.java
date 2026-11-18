@@ -33,18 +33,18 @@ public class AccountDAO {
      * VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW());
      */
     public boolean save(Account account) throws SQLException {
-        String sql = "INSERT INTO accounts (account_number, customer_id, customer_name, email, phone, " +
-                     "account_type, balance, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return save(account, conn);
+        }
+    }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+    /** Inserts using a caller-managed connection so customer and account can commit together. */
+    public boolean save(Account account, Connection conn) throws SQLException {
+        String sql = "INSERT INTO accounts (account_number, customer_id, customer_name, email, phone, account_type, balance, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, account.getAccountNumber());
-            if (account.getCustomerId() != null) {
-                stmt.setLong(2, account.getCustomerId());
-            } else {
-                stmt.setNull(2, Types.BIGINT);
-            }
+            if (account.getCustomerId() != null) stmt.setLong(2, account.getCustomerId());
+            else stmt.setNull(2, Types.BIGINT);
             stmt.setString(3, account.getCustomerName());
             stmt.setString(4, account.getEmail());
             stmt.setString(5, account.getPhone());
@@ -52,9 +52,7 @@ public class AccountDAO {
             stmt.setBigDecimal(7, account.getBalance());
             stmt.setString(8, account.getStatus());
             stmt.setTimestamp(9, Timestamp.valueOf(account.getCreatedAt()));
-
-            int rows = stmt.executeUpdate();
-            return rows > 0;
+            return stmt.executeUpdate() > 0;
         }
     }
 
