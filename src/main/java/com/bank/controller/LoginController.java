@@ -1,8 +1,12 @@
 package com.bank.controller;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import com.bank.Main;
 import com.bank.service.AuthenticationService;
 import com.bank.service.ServiceFactory;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,9 +14,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 /**
  * Controller for the Login screen.
@@ -52,32 +53,59 @@ public class LoginController implements Initializable {
     }
 
     @FXML
-    public void handleLogin(ActionEvent event) {
-        clearMessage();
+public void handleLogin(ActionEvent event) {
+    clearMessage();
 
-        String username = usernameField.getText();
-        String password = passwordField.getText();
+    String username = usernameField.getText();
+    String password = passwordField.getText();
 
-        if (username == null || username.trim().isEmpty()) {
-            username = "Priya Nair (Branch Officer)";
-        } else if ("admin".equalsIgnoreCase(username.trim())) {
-            username = "Aarav Sharma (System Admin)";
-        } else if ("keerthana".equalsIgnoreCase(username.trim()) || "priya".equalsIgnoreCase(username.trim())) {
-            username = "Priya Nair (Branch Officer)";
-        } else if ("teller".equalsIgnoreCase(username.trim())) {
-            username = "Karthik Iyer (Front Desk Teller)";
-        }
-
-        // Authenticate and grant access to dashboard
-        authService.authenticate(username, password);
-        Main.navigateTo("dashboard.fxml", "Apex Trust Bank - Operational Dashboard");
+    if (username == null || username.trim().isEmpty()) {
+        showErrorMessage("Please enter your username.");
+        return;
     }
 
-    @FXML
-    public void handleBypass(ActionEvent event) {
-        authService.authenticate("Priya Nair (Branch Officer)", "bypass");
-        Main.navigateTo("dashboard.fxml", "Apex Trust Bank - Operational Dashboard");
+    if (password == null || password.isEmpty()) {
+        showErrorMessage("Please enter your password.");
+        return;
     }
+
+    boolean authenticated = authService.authenticate(
+            username.trim(),
+            password
+    );
+
+    if (authenticated) {
+        Main.navigateTo(
+                "dashboard.fxml",
+                "Apex Trust Bank - Operational Dashboard"
+        );
+    } else {
+        showErrorMessage("Invalid username or password.");
+    }
+}
+   @FXML
+public void handleBypass(ActionEvent event) {
+    clearMessage();
+
+    if (!authService.isDemoMode()) {
+        showErrorMessage("Demo bypass is disabled in production mode.");
+        return;
+    }
+
+    boolean authenticated = authService.authenticate(
+            "Priya Nair (Branch Officer)",
+            "bypass"
+    );
+
+    if (authenticated) {
+        Main.navigateTo(
+                "dashboard.fxml",
+                "Apex Trust Bank - Operational Dashboard"
+        );
+    } else {
+        showErrorMessage("Demo login failed.");
+    }
+}
 
     @FXML
     public void fillAdminCredentials(ActionEvent event) {

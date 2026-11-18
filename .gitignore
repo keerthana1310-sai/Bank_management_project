@@ -53,3 +53,8 @@ Thumbs.db
 # Project backups
 .backup/
 *.csv
+
+# Environment configuration and secrets
+.env
+.env.*
+!.env.example

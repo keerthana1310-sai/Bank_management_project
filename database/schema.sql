@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 -- -------------------------------------------------------------------
 -- 4. Table: users
 -- Stores staff/teller authentication credentials.
--- NOTE: In production, password_hash should store BCrypt or Argon2 hashes.
+-- Passwords are stored using PBKDF2WithHmacSHA256 hashing.
 -- -------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
